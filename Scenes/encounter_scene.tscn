@@ -1,0 +1,418 @@
+[gd_scene format=3 uid="uid://c5xqwm8jb0xa7"]
+
+[ext_resource type="Texture2D" uid="uid://4ds1gprw6g86" path="res://Sprites/Characters/PlayerBackside.png" id="1_player"]
+[ext_resource type="Texture2D" uid="uid://bqsqwmjm0xa6g" path="res://Sprites/Demon1.png" id="2_demon"]
+[ext_resource type="Texture2D" uid="uid://cora5mdds4h3o" path="res://Background/Floor.png" id="3_floor"]
+[ext_resource type="Texture2D" uid="uid://bdcciisiow4fr" path="res://Sprites/UnderShade.png" id="3_t5o03"]
+[ext_resource type="Texture2D" uid="uid://dfnxdkg66eqqj" path="res://Sprites/UI/PartyFrames.png" id="4_frames"]
+[ext_resource type="Texture2D" uid="uid://bomsr2y5g1oyb" path="res://Sprites/UI/Portrait.png" id="5_portrait"]
+[ext_resource type="Script" uid="uid://crp143gt3k7xr" path="res://Scripts/encounter.gd" id="6_encounter"]
+[ext_resource type="Texture2D" uid="uid://b06vk0wgxvvar" path="res://Sprites/Soothing Heal.png" id="7_heal"]
+[ext_resource type="Texture2D" uid="uid://dxse1qcwsqqvs" path="res://Sprites/UI/SpellBar.png" id="8_spellbar"]
+[ext_resource type="Texture2D" uid="uid://bspm8drfdek13" path="res://Sprites/UI/Member1Unselected.png" id="11_member_unsel"]
+[ext_resource type="Texture2D" uid="uid://bdwrolqemwq2n" path="res://Sprites/MemberAttack.png" id="12_attack"]
+[ext_resource type="Script" uid="uid://xfhw468o48ln" path="res://Scripts/party_member.gd" id="13_member_script"]
+[ext_resource type="Script" uid="uid://c50cvknnk4pd6" path="res://Scripts/heal_ability.gd" id="14_heal_ability"]
+[ext_resource type="Texture2D" uid="uid://fjqs78s4fjvs" path="res://Sprites/Soothing Heal (Disabled).png" id="15_heal_disabled"]
+[ext_resource type="Script" uid="uid://butw3b8vnukg" path="res://Scripts/encounter_enemy.gd" id="16_enemy_script"]
+[ext_resource type="AudioStream" uid="uid://bfxsc8ibx13g1" path="res://Music/Round One.mp3" id="17_battle_music"]
+
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_out_of_mana"]
+
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_heal"]
+buffer_length = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.2, 0.2, 0.2, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fill"]
+bg_color = Color(1, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_timer_bg"]
+bg_color = Color(0.1, 0.1, 0.1, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.4, 0.4, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_timer_fill"]
+bg_color = Color(1, 0.55, 0.1, 1)
+
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_enemy_attack"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_partyframes"]
+size = Vector2(400, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_portrait"]
+size = Vector2(100, 86)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mana_fill"]
+bg_color = Color(0, 0.5, 1, 1)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_heal"]
+radius = 30.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cooldown_bg"]
+bg_color = Color(0.1, 0.1, 0.1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cooldown_fill"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_victory_bg"]
+bg_color = Color(0.09, 0.07, 0.18, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.85, 0.65, 0.2, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="Gradient" id="Gradient_victory_glow"]
+colors = PackedColorArray(0.35, 0.25, 0.55, 0.6, 0.09, 0.07, 0.18, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_victory_glow"]
+gradient = SubResource("Gradient_victory_glow")
+width = 400
+height = 320
+fill = 1
+fill_from = Vector2(0.5, 0.45)
+fill_to = Vector2(1, 0.45)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_victory_exp_bg"]
+bg_color = Color(0.05, 0.05, 0.1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.4, 0.2, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_victory_exp_fill"]
+bg_color = Color(0.3, 0.85, 0.95, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_continue_button"]
+bg_color = Color(0.5, 0.32, 0.12, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.9, 0.7, 0.3, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[node name="EncounterScene" type="Node2D" unique_id=721240017]
+script = ExtResource("6_encounter")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1232081266]
+
+[node name="BattleMusic" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("17_battle_music")
+volume_db = -6.0
+autoplay = true
+
+[node name="OutOfManaSound" type="AudioStreamPlayer" parent="." unique_id=221992335]
+stream = SubResource("AudioStreamGenerator_out_of_mana")
+
+[node name="HealSound" type="AudioStreamPlayer" parent="." unique_id=383135079]
+stream = SubResource("AudioStreamGenerator_heal")
+
+[node name="Background" type="Sprite2D" parent="." unique_id=409861334]
+z_index = -1
+position = Vector2(-1, 1)
+scale = Vector2(1.7267267, 2.132013)
+texture = ExtResource("3_floor")
+
+[node name="Player" type="Sprite2D" parent="." unique_id=1906921443]
+position = Vector2(-288, 169)
+scale = Vector2(2, 2)
+texture = ExtResource("1_player")
+
+[node name="UnderShade" type="Sprite2D" parent="." unique_id=1451573533]
+position = Vector2(257, -29)
+scale = Vector2(3.0390625, 2.0546875)
+texture = ExtResource("3_t5o03")
+
+[node name="Enemy" type="Sprite2D" parent="." unique_id=2134645460]
+position = Vector2(272, -145)
+scale = Vector2(2, 2)
+texture = ExtResource("2_demon")
+script = ExtResource("16_enemy_script")
+attack_damage = 30.0
+attack_interval = 4.0
+
+[node name="EnemyHealthBar" type="ProgressBar" parent="Enemy" unique_id=1416496224]
+offset_left = -50.0
+offset_top = -80.0
+offset_right = 50.0
+offset_bottom = -70.0
+theme_override_styles/background = SubResource("StyleBoxFlat_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
+value = 100.0
+show_percentage = false
+
+[node name="AttackSound" type="AudioStreamPlayer" parent="Enemy" unique_id=566857299]
+stream = SubResource("AudioStreamGenerator_enemy_attack")
+
+[node name="AttackTimerBar" type="ProgressBar" parent="Enemy"]
+offset_left = -75.0
+offset_top = -40.0
+offset_right = -63.0
+offset_bottom = 20.0
+theme_override_styles/background = SubResource("StyleBoxFlat_timer_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_timer_fill")
+fill_mode = 3
+show_percentage = false
+
+[node name="PartyFrames" type="Sprite2D" parent="." unique_id=479134542]
+position = Vector2(0, 250)
+texture = ExtResource("4_frames")
+
+[node name="DeselectArea" type="Area2D" parent="PartyFrames" unique_id=1346835228]
+z_index = -1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PartyFrames/DeselectArea" unique_id=350473224]
+shape = SubResource("RectangleShape2D_partyframes")
+
+[node name="SpellBar" type="Sprite2D" parent="PartyFrames" unique_id=408810558]
+position = Vector2(410.25, -32.5)
+scale = Vector2(0.6337891, 1.6015625)
+texture = ExtResource("8_spellbar")
+
+[node name="Portrait" type="Sprite2D" parent="PartyFrames" unique_id=1092402049]
+position = Vector2(-193, -1)
+texture = ExtResource("5_portrait")
+
+[node name="PortraitArea" type="Area2D" parent="PartyFrames/Portrait" unique_id=668271714]
+z_index = 1
+priority = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PartyFrames/Portrait/PortraitArea" unique_id=1079045417]
+position = Vector2(-2, -8)
+shape = SubResource("RectangleShape2D_portrait")
+
+[node name="HealthBar" type="ProgressBar" parent="PartyFrames/Portrait" unique_id=307267137]
+offset_left = -44.0
+offset_top = 24.0
+offset_right = 36.0
+offset_bottom = 34.0
+theme_override_styles/background = SubResource("StyleBoxFlat_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
+value = 100.0
+show_percentage = false
+
+[node name="ManaBar" type="ProgressBar" parent="PartyFrames/Portrait" unique_id=355123520]
+offset_left = -44.0
+offset_top = 36.0
+offset_right = 36.0
+offset_bottom = 46.0
+theme_override_styles/background = SubResource("StyleBoxFlat_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_mana_fill")
+value = 50.0
+show_percentage = false
+
+[node name="MemberPortrait" type="Sprite2D" parent="PartyFrames" unique_id=1903391106]
+position = Vector2(-88, -1)
+texture = ExtResource("11_member_unsel")
+script = ExtResource("13_member_script")
+attack_interval = 1.3
+
+[node name="MemberArea" type="Area2D" parent="PartyFrames/MemberPortrait" unique_id=1779858525]
+z_index = 1
+priority = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PartyFrames/MemberPortrait/MemberArea" unique_id=710530453]
+position = Vector2(-2, -8)
+shape = SubResource("RectangleShape2D_portrait")
+
+[node name="MemberHealthBar" type="ProgressBar" parent="PartyFrames/MemberPortrait" unique_id=489347221]
+offset_left = -44.0
+offset_top = 24.0
+offset_right = 36.0
+offset_bottom = 34.0
+theme_override_styles/background = SubResource("StyleBoxFlat_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_fill")
+value = 100.0
+show_percentage = false
+
+[node name="MemberAttackSprite" type="Sprite2D" parent="PartyFrames/MemberPortrait" unique_id=268749499]
+visible = false
+position = Vector2(0, -40)
+texture = ExtResource("12_attack")
+
+[node name="SoothingHeal" type="Area2D" parent="PartyFrames" unique_id=2068034880]
+position = Vector2(250, 0)
+scale = Vector2(0.6, 0.6)
+script = ExtResource("14_heal_ability")
+heal_amount = 20.0
+mana_cost = 30.0
+disabled_texture = ExtResource("15_heal_disabled")
+
+[node name="Sprite2D" type="Sprite2D" parent="PartyFrames/SoothingHeal" unique_id=1677949669]
+position = Vector2(68.33333, -141.66669)
+scale = Vector2(0.48046875, 0.44791663)
+texture = ExtResource("7_heal")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PartyFrames/SoothingHeal" unique_id=1823580739]
+position = Vector2(68.333336, -131.66666)
+shape = SubResource("CircleShape2D_heal")
+
+[node name="CooldownBar" type="ProgressBar" parent="PartyFrames/SoothingHeal" unique_id=126243973]
+offset_left = 36.666664
+offset_top = -186.66666
+offset_right = 96.666664
+offset_bottom = -176.66666
+theme_override_styles/background = SubResource("StyleBoxFlat_cooldown_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_cooldown_fill")
+max_value = 5.0
+show_percentage = false
+
+[node name="KeyLabel" type="Label" parent="PartyFrames/SoothingHeal" unique_id=1045660732]
+offset_left = 40.0
+offset_top = -110.0
+offset_right = 60.0
+offset_bottom = -90.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 24
+text = "1"
+
+[node name="VictoryLayer" type="CanvasLayer" parent="." unique_id=1056312732]
+layer = 10
+visible = false
+
+[node name="VictoryPopup" type="Panel" parent="VictoryLayer" unique_id=1096421771]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -160.0
+offset_right = 200.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_victory_bg")
+
+[node name="Glow" type="TextureRect" parent="VictoryLayer/VictoryPopup" unique_id=535257419]
+layout_mode = 0
+offset_right = 400.0
+offset_bottom = 320.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_victory_glow")
+expand_mode = 1
+
+[node name="VictoryLabel" type="Label" parent="VictoryLayer/VictoryPopup" unique_id=1483825230]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 16.0
+offset_right = 310.0
+offset_bottom = 46.0
+theme_override_colors/font_color = Color(1, 0.78, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0.25, 0.1, 0.02, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 22
+text = "MONSTER DEFEATED!"
+horizontal_alignment = 1
+
+[node name="RewardsLabel" type="Label" parent="VictoryLayer/VictoryPopup" unique_id=1352403889]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 65.0
+offset_right = 180.0
+offset_bottom = 90.0
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 18
+text = "Rewards:"
+
+[node name="ExpLabel" type="Label" parent="VictoryLayer/VictoryPopup" unique_id=313148382]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 65.0
+offset_right = 370.0
+offset_bottom = 90.0
+theme_override_colors/font_color = Color(0.4, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "+30 EXP"
+horizontal_alignment = 2
+
+[node name="LevelLabel" type="Label" parent="VictoryLayer/VictoryPopup" unique_id=538263711]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 98.0
+offset_right = 100.0
+offset_bottom = 118.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "LV 1"
+
+[node name="ExpBar" type="ProgressBar" parent="VictoryLayer/VictoryPopup" unique_id=476610672]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 122.0
+offset_right = 370.0
+offset_bottom = 140.0
+theme_override_styles/background = SubResource("StyleBoxFlat_victory_exp_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_victory_exp_fill")
+value = 30.0
+show_percentage = false
+
+[node name="ExpMinLabel" type="Label" parent="VictoryLayer/VictoryPopup" unique_id=1148554070]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 143.0
+offset_right = 80.0
+offset_bottom = 158.0
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "0"
+
+[node name="ExpMaxLabel" type="Label" parent="VictoryLayer/VictoryPopup" unique_id=1105183255]
+layout_mode = 0
+offset_left = 300.0
+offset_top = 143.0
+offset_right = 370.0
+offset_bottom = 158.0
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "100"
+horizontal_alignment = 2
+
+[node name="LevelUpLabel" type="Label" parent="VictoryLayer/VictoryPopup" unique_id=891245773]
+visible = false
+layout_mode = 0
+offset_left = 90.0
+offset_top = 182.0
+offset_right = 310.0
+offset_bottom = 206.0
+theme_override_colors/font_color = Color(0.5, 1, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.2, 0.05, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 20
+text = "LEVEL UP!"
+horizontal_alignment = 1
+
+[node name="ContinueButton" type="Button" parent="VictoryLayer/VictoryPopup" unique_id=522648782]
+layout_mode = 0
+offset_left = 125.0
+offset_top = 255.0
+offset_right = 275.0
+offset_bottom = 300.0
+theme_override_colors/font_color = Color(1, 0.92, 0.7, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_continue_button")
+text = "Continue"
