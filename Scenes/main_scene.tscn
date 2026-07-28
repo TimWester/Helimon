@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://cwalkback001" path="res://Sprites/Characters/PlayerWalkBack.png" id="10_walk_back"]
 [ext_resource type="Texture2D" uid="uid://cwalkdown001" path="res://Sprites/Characters/PlayerWalkDown.png" id="11_walk_down"]
 [ext_resource type="AudioStream" uid="uid://d226iqx1ybj35" path="res://Music/AmbientMusic.mp3" id="12_ambient_music"]
-[ext_resource type="TileSet" path="res://Background/FloorTileSet.tres" id="13_floor_tileset"]
+[ext_resource type="TileSet" uid="uid://cwvr0il3p060p" path="res://Background/FloorTileSet.tres" id="13_floor_tileset"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inv_bg"]
 bg_color = Color(0.2, 0.2, 0.2, 0.95)
@@ -1036,6 +1036,8 @@ shape = SubResource("RectangleShape2D_wall_200")
 [node name="Enemy1" type="Area2D" parent="." unique_id=79758841]
 position = Vector2(0, -300)
 script = ExtResource("5_enemy")
+attack_damage = 30.0
+attack_interval = 4.0
 
 [node name="Sprite2D" type="Sprite2D" parent="Enemy1" unique_id=1471269493]
 texture = ExtResource("4_demon")
