@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://c17tp7tf85ly6"]
+
+[ext_resource type="Script" uid="uid://c50cvknnk4pd6" path="res://Scripts/Abilities/heal_ability.gd" id="1_heal"]
+[ext_resource type="Texture2D" uid="uid://rjjkmexqgtfb" path="res://Sprites/Greater Heal (Disabled).png" id="2_1byd7"]
+[ext_resource type="Texture2D" uid="uid://3smywdlxvthr" path="res://Sprites/Greater Heal.png" id="3_yp3fr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_06dvt"]
+size = Vector2(34.666668, 34)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cd_bg"]
+bg_color = Color(0.1, 0.1, 0.1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cd_fill"]
+bg_color = Color(1, 1, 1, 1)
+
+[node name="GreaterHealAbility" type="Area2D" unique_id=993794663]
+script = ExtResource("1_heal")
+ability_name = "Greater Heal"
+disabled_texture = ExtResource("2_1byd7")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=273795619]
+texture = ExtResource("3_yp3fr")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1945630936]
+position = Vector2(1.4305115e-06, 0.5)
+scale = Vector2(1.5, 1.5)
+shape = SubResource("RectangleShape2D_06dvt")
+
+[node name="CooldownBar" type="ProgressBar" parent="." unique_id=1421792177]
+offset_left = -20.0
+offset_top = -30.0
+offset_right = 20.0
+offset_bottom = -24.0
+theme_override_styles/background = SubResource("StyleBoxFlat_cd_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_fill")
+max_value = 5.0
+show_percentage = false
+
+[node name="KeyLabel" type="Label" parent="." unique_id=948953103]
+offset_left = -12.0
+offset_top = 16.0
+offset_right = 12.0
+offset_bottom = 36.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 16
+text = "2"
+horizontal_alignment = 1

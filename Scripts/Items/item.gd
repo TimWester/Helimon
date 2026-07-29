@@ -27,6 +27,8 @@ enum EquipSlot { NONE, NECKLACE, HELM, HAND, SHOULDER, RING, TORSO, LEGS, BOOTS 
 @export var mana_bonus: float = 0.0
 ## Damage bonus when this item is equipped
 @export var damage_bonus: float = 0.0
+## Haste bonus when this item is equipped (reduces cast time and cooldowns)
+@export var haste_bonus: float = 0.0
 
 ## Returns a formatted description of the item's stats for tooltips
 func get_stats_text() -> String:
@@ -40,6 +42,8 @@ func get_stats_text() -> String:
 		stats.append("+" + str(int(mana_bonus)) + " Mana")
 	if damage_bonus != 0.0:
 		stats.append("+" + str(int(damage_bonus)) + " Damage")
+	if haste_bonus != 0.0:
+		stats.append("+" + str(int(haste_bonus)) + " Haste")
 	
 	if stats.size() > 0:
 		return "\n".join(stats)
@@ -57,6 +61,8 @@ func apply_stats() -> void:
 		GameState.player_current_mana = min(GameState.player_current_mana + mana_bonus, GameState.player_max_mana)
 	if damage_bonus != 0.0:
 		GameState.player_base_damage += damage_bonus
+	if haste_bonus != 0.0:
+		GameState.player_haste += haste_bonus
 
 ## Remove this item's stats from the player (when unequipped)
 func remove_stats() -> void:
@@ -70,3 +76,5 @@ func remove_stats() -> void:
 		GameState.player_current_mana = min(GameState.player_current_mana, GameState.player_max_mana)
 	if damage_bonus != 0.0:
 		GameState.player_base_damage -= damage_bonus
+	if haste_bonus != 0.0:
+		GameState.player_haste -= haste_bonus

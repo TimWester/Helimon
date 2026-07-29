@@ -1,6 +1,11 @@
 extends CharacterBody2D
 
 var speed = 200.0
+var active_key = 0  # The key currently controlling movement (0 = none)
+var prev_w = false
+var prev_s = false
+var prev_a = false
+var prev_d = false
 
 # Player Stats (editable in Inspector)
 @export_group("Player Stats")
@@ -8,6 +13,7 @@ var speed = 200.0
 @export var max_mana: float = 50.0
 @export var base_damage: float = 10.0
 @export var spirit: float = 5.0
+@export var haste: float = 0.0
 
 # Stat gains and exp requirements for leveling up from level 1 to level 10.
 # Each array has 9 entries: index 0 = reaching level 2, index 1 = reaching
@@ -19,6 +25,7 @@ var speed = 200.0
 @export var mana_gain_per_level: Array[float] = [5.0, 5.0, 8.0, 8.0, 10.0, 10.0, 12.0, 12.0, 15.0]
 @export var damage_gain_per_level: Array[float] = [2.0, 3.0, 3.0, 4.0, 4.0, 5.0, 5.0, 6.0, 6.0]
 @export var spirit_gain_per_level: Array[float] = [1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0]
+@export var haste_gain_per_level: Array[float] = [0.5, 0.5, 1.0, 1.0, 1.5, 1.5, 2.0, 2.0, 2.5]
 @export var exp_required_per_level: Array[float] = [100.0, 150.0, 220.0, 300.0, 400.0, 520.0, 660.0, 820.0, 1000.0]
 
 @onready var animated_sprite = $AnimatedSprite2D
@@ -35,29 +42,74 @@ func _ready() -> void:
 		GameState.player_current_mana = max_mana
 		GameState.player_base_damage = base_damage
 		GameState.player_spirit = spirit
+		GameState.player_haste = haste
 		GameState.player_exp_to_next_level = exp_required_per_level[0] if exp_required_per_level.size() > 0 else 100.0
 		GameState.stats_initialized = true
 	
 	# Leveling configuration can be tweaked live in the Inspector, so keep
 	# GameState's copy in sync every time the player node loads.
-	GameState.set_leveling_data(max_level, health_gain_per_level, mana_gain_per_level, damage_gain_per_level, spirit_gain_per_level, exp_required_per_level)
+	GameState.set_leveling_data(max_level, health_gain_per_level, mana_gain_per_level, damage_gain_per_level, spirit_gain_per_level, haste_gain_per_level, exp_required_per_level)
 
 func _physics_process(_delta: float) -> void:
 	var input_velocity = Vector2.ZERO
 	
-	if Input.is_key_pressed(KEY_W):
+	# Check current key states
+	var curr_w = Input.is_physical_key_pressed(KEY_W)
+	var curr_s = Input.is_physical_key_pressed(KEY_S)
+	var curr_a = Input.is_physical_key_pressed(KEY_A)
+	var curr_d = Input.is_physical_key_pressed(KEY_D)
+	
+	# If active key is released, switch to any other held key or reset
+	if active_key == KEY_W and not curr_w:
+		active_key = 0
+	elif active_key == KEY_S and not curr_s:
+		active_key = 0
+	elif active_key == KEY_A and not curr_a:
+		active_key = 0
+	elif active_key == KEY_D and not curr_d:
+		active_key = 0
+	
+	# When active key is released, check for other held keys
+	if active_key == 0:
+		if curr_w:
+			active_key = KEY_W
+		elif curr_s:
+			active_key = KEY_S
+		elif curr_a:
+			active_key = KEY_A
+		elif curr_d:
+			active_key = KEY_D
+	
+	# If a new key is pressed, it becomes the active key (overriding previous)
+	if curr_w and not prev_w:
+		active_key = KEY_W
+	if curr_s and not prev_s:
+		active_key = KEY_S
+	if curr_a and not prev_a:
+		active_key = KEY_A
+	if curr_d and not prev_d:
+		active_key = KEY_D
+	
+	# Store current states for next frame
+	prev_w = curr_w
+	prev_s = curr_s
+	prev_a = curr_a
+	prev_d = curr_d
+	
+	# Move ONLY in the active direction (ignore other held keys)
+	if active_key == KEY_W:
 		input_velocity.y -= 1
 		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_up"):
 			animated_sprite.play("walk_up")
-	elif Input.is_key_pressed(KEY_S):
+	elif active_key == KEY_S:
 		input_velocity.y += 1
 		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_down"):
 			animated_sprite.play("walk_down")
-	elif Input.is_key_pressed(KEY_A):
+	elif active_key == KEY_A:
 		input_velocity.x -= 1
 		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_left"):
 			animated_sprite.play("walk_left")
-	elif Input.is_key_pressed(KEY_D):
+	elif active_key == KEY_D:
 		input_velocity.x += 1
 		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_right"):
 			animated_sprite.play("walk_right")

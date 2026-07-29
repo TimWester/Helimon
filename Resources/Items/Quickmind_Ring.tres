@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://bjljrvskkj7gw"]
+
+[ext_resource type="Script" uid="uid://b5v3qx8yt2ml7" path="res://Scripts/Items/item.gd" id="1_bekvq"]
+[ext_resource type="Texture2D" uid="uid://cxvx5grx027d7" path="res://Sprites/Items/Equipment/quickmind_ring_sprite.png" id="1_n3g6f"]
+
+[resource]
+script = ExtResource("1_bekvq")
+item_name = "Quickmind Ring"
+description = "An enchanted ring that increases the wearer's haste"
+icon = ExtResource("1_n3g6f")
+equip_slot = 5
+haste_bonus = 2.0

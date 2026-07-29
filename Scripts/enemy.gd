@@ -8,6 +8,7 @@ extends Area2D
 @export var attack_damage: float = 5.0
 @export var attack_interval: float = 1.0
 @export var exp_reward: float = 30.0
+@export var is_aoe_attack: bool = false  ## If true, enemy attacks all party members at once
 
 @export_group("Rewards")
 ## Items dropped when this enemy is defeated (can add multiple items)
@@ -48,6 +49,7 @@ func _on_body_entered(body: Node2D) -> void:
 			attack_frame_count,
 			projectile_sheet,
 			projectile_frame_count,
-			item_rewards
+			item_rewards,
+			is_aoe_attack
 		)
 		get_tree().call_deferred("change_scene_to_file", "res://Scenes/encounter_scene.tscn")

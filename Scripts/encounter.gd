@@ -6,17 +6,20 @@ extends Node2D
 @onready var player = $Player
 @onready var heal_ability: HealAbility = $PartyFrames/SpellSlots/SoothingHeal
 @onready var greater_heal_ability: HealAbility = $PartyFrames/SpellSlots/GreaterHeal
+@onready var mass_heal_ability: AOEHealAbility = $PartyFrames/SpellSlots/MassHeal
 @onready var spell_slots: SpellBar = $PartyFrames/SpellSlots
 @onready var portrait = $PartyFrames/Portrait
 @onready var portrait_area = $PartyFrames/Portrait/PortraitArea
+@onready var portrait_blob_effect: Sprite2D = $PartyFrames/Portrait/BlobEffect
 @onready var member: PartyMember = $PartyFrames/MemberPortrait
+@onready var member_blob_effect: Sprite2D = $PartyFrames/MemberPortrait/BlobEffect
 @onready var deselect_area = $PartyFrames/DeselectArea
 @onready var casting_ui: Control = $PartyFrames/CastingUI
 @onready var cast_bar: ProgressBar = $PartyFrames/CastingUI/CastBar
 @onready var cast_label: Label = $PartyFrames/CastingUI/CastLabel
 @onready var cast_sound: AudioStreamPlayer = $CastSound
 @onready var ability_tooltip: PanelContainer = $AbilityTooltipLayer/AbilityTooltip
-@onready var ability_tooltip_label: Label = $AbilityTooltipLayer/AbilityTooltip/TooltipLabel
+@onready var ability_tooltip_label: RichTextLabel = $AbilityTooltipLayer/AbilityTooltip/TooltipLabel
 @onready var victory_layer: CanvasLayer = $VictoryLayer
 @onready var victory_popup: Panel = $VictoryLayer/VictoryPopup
 @onready var victory_label: Label = $VictoryLayer/VictoryPopup/VictoryLabel
@@ -88,6 +91,10 @@ func _ready() -> void:
 	
 	# Setup member
 	member.health_bar = member.get_node("MemberHealthBar")
+	member.attack_timer_bar = member.get_node("MemberAttackTimerBar")
+	if member.attack_timer_bar:
+		member.attack_timer_bar.max_value = member.attack_interval
+		member.attack_timer_bar.value = 0.0
 	member.attack_sprite = member.get_node("MemberAttackSprite")
 	member.member_area = member.get_node("MemberArea")
 	member.selected_texture = preload("res://Sprites/UI/Member1Selected.png")
@@ -96,7 +103,7 @@ func _ready() -> void:
 	
 	# Setup every spell currently on the spell bar (works for future spells too)
 	for ability in spell_slots.get_abilities():
-		if ability is HealAbility:
+		if ability.has_method("setup"):
 			ability.setup(self, portrait, health_bar, member)
 	
 	if casting_ui:
@@ -123,6 +130,16 @@ func _ready() -> void:
 	defeat_continue_button.pressed.connect(_on_defeat_continue_pressed)
 
 func _process(delta: float) -> void:
+	# Allow Space key to press Continue button on victory/defeat screens
+	if victory_layer and victory_layer.visible and Input.is_action_just_pressed("ui_accept"):
+		if continue_button and continue_button.visible:
+			_on_continue_pressed()
+			return
+	
+	if defeat_layer and defeat_layer.visible and Input.is_action_just_pressed("ui_accept"):
+		_on_defeat_continue_pressed()
+		return
+	
 	# Stop all combat when battle is over
 	if is_battle_over:
 		return
@@ -133,7 +150,8 @@ func _process(delta: float) -> void:
 	
 	# Regenerate mana based on the player's spirit stat
 	if current_mana < max_mana:
-		current_mana = min(current_mana + mana_regen_rate * delta, max_mana)
+		var mana_per_second = GameState.player_spirit * GameState.spirit_to_mana_multiplier
+		current_mana = min(current_mana + mana_per_second * delta, max_mana)
 		mana_bar.value = current_mana
 	
 	time_since_attack += delta
@@ -147,6 +165,15 @@ func _process(delta: float) -> void:
 	# Member attack
 	if member.can_attack(delta):
 		member_attack()
+
+func get_all_party_members() -> Array[PartyMember]:
+	## Returns every PartyMember currently in the encounter, however many
+	## there are, so AOE abilities automatically scale with the party size.
+	var members: Array[PartyMember] = []
+	for child in $PartyFrames.get_children():
+		if child is PartyMember:
+			members.append(child)
+	return members
 
 func _on_portrait_clicked(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -180,10 +207,13 @@ func _on_enemy_attack_hit() -> void:
 	if is_battle_over:
 		return
 	
-	# Randomly choose target: 0 = player, 1 = member
-	var target = randi() % 2
-	
-	if target == 0:
+	# Check if this enemy has AOE attacks
+	if GameState.encounter_enemy_is_aoe:
+		# AOE attack: show blob effects, then hit all party members after a brief delay
+		_play_aoe_blob_effects()
+		# Delay damage slightly so blob effects show first
+		await get_tree().create_timer(0.3).timeout
+		
 		# Attack player
 		current_health -= enemy.attack_damage
 		if current_health < 0:
@@ -191,15 +221,36 @@ func _on_enemy_attack_hit() -> void:
 		health_bar.value = current_health
 		show_damage_number(enemy.attack_damage, portrait.global_position)
 		
-		if current_health <= 0:
-			on_player_defeated()
-	else:
 		# Attack member
 		member.take_damage(enemy.attack_damage)
 		show_damage_number(enemy.attack_damage, member.global_position)
 		
-		if not member.is_alive():
+		# Check for defeats
+		if current_health <= 0:
+			on_player_defeated()
+		elif not member.is_alive():
 			on_party_member_defeated()
+	else:
+		# Single target attack: randomly choose target: 0 = player, 1 = member
+		var target = randi() % 2
+		
+		if target == 0:
+			# Attack player
+			current_health -= enemy.attack_damage
+			if current_health < 0:
+				current_health = 0
+			health_bar.value = current_health
+			show_damage_number(enemy.attack_damage, portrait.global_position)
+			
+			if current_health <= 0:
+				on_player_defeated()
+		else:
+			# Attack member
+			member.take_damage(enemy.attack_damage)
+			show_damage_number(enemy.attack_damage, member.global_position)
+			
+			if not member.is_alive():
+				on_party_member_defeated()
 
 func on_player_defeated() -> void:
 	is_battle_over = true
@@ -257,16 +308,19 @@ func on_enemy_defeated() -> void:
 			GameState.add_item_to_inventory(item)
 			print("Item added to inventory: ", item.item_name)
 	
-	# Reflect any stat/health/mana changes from leveling up immediately
+	# Reflect any stat changes from leveling up immediately
 	if levels_gained_this_battle > 0:
 		max_health = GameState.player_max_health
-		current_health = GameState.player_current_health
 		max_mana = GameState.player_max_mana
-		current_mana = GameState.player_current_mana
-		health_bar.max_value = max_health
-		health_bar.value = current_health
-		mana_bar.max_value = max_mana
-		mana_bar.value = current_mana
+	
+	# Victory fully restores health only (mana regenerates gradually via spirit)
+	current_health = max_health
+	GameState.player_current_health = current_health
+	health_bar.max_value = max_health
+	health_bar.value = current_health
+	
+	# Update mana bar max if level up changed it, but keep current mana as-is
+	mana_bar.max_value = max_mana
 	
 	# Mark enemy as defeated
 	GameState.mark_enemy_defeated()
@@ -429,6 +483,26 @@ func _on_victory_exp_animation_finished() -> void:
 			level_up_label.text = "LEVEL UP!"
 	continue_button.visible = true
 
+func _play_aoe_blob_effects() -> void:
+	## Play the slime blob falling animation on both portraits
+	if portrait_blob_effect:
+		portrait_blob_effect.visible = true
+		portrait_blob_effect.position = Vector2(0, -100)
+		portrait_blob_effect.modulate.a = 1.0
+		var tween1 = create_tween()
+		tween1.tween_property(portrait_blob_effect, "position", Vector2(0, -40), 0.3)
+		tween1.parallel().tween_property(portrait_blob_effect, "modulate:a", 0.0, 0.3)
+		tween1.tween_callback(func(): portrait_blob_effect.visible = false)
+	
+	if member_blob_effect:
+		member_blob_effect.visible = true
+		member_blob_effect.position = Vector2(0, -100)
+		member_blob_effect.modulate.a = 1.0
+		var tween2 = create_tween()
+		tween2.tween_property(member_blob_effect, "position", Vector2(0, -40), 0.3)
+		tween2.parallel().tween_property(member_blob_effect, "modulate:a", 0.0, 0.3)
+		tween2.tween_callback(func(): member_blob_effect.visible = false)
+
 func show_damage_number(damage: float, target_position: Vector2, color: Color = Color(1, 0, 0, 1)) -> void:
 	var damage_label = Label.new()
 	damage_label.text = str(int(damage))
@@ -576,33 +650,37 @@ func is_any_ability_casting() -> bool:
 func show_ability_tooltip(text: String) -> void:
 	if not ability_tooltip or not ability_tooltip_label:
 		return
+	ability_tooltip_visible = true
 	ability_tooltip_label.text = text
 	ability_tooltip.visible = true
-	ability_tooltip_visible = true
 	# Let the label size the panel, then place it near the cursor
 	ability_tooltip.reset_size()
 	_position_ability_tooltip()
 
 func hide_ability_tooltip() -> void:
+	# Only hide if we're not already showing a tooltip (prevents flicker during fast mouse movement)
 	ability_tooltip_visible = false
 	if ability_tooltip:
-		ability_tooltip.visible = false
+		# Small delay to prevent hide/show race condition when moving between abilities
+		await get_tree().create_timer(0.05).timeout
+		# Check again - if another ability showed tooltip during delay, don't hide
+		if not ability_tooltip_visible:
+			ability_tooltip.visible = false
 
 func _position_ability_tooltip() -> void:
 	if not ability_tooltip:
 		return
 	var mouse_pos = get_viewport().get_mouse_position()
-	var offset = Vector2(18, 18)
 	var tooltip_size = ability_tooltip.get_combined_minimum_size()
 	if ability_tooltip.size.x > 1.0:
 		tooltip_size = ability_tooltip.size
 	
 	var viewport_size = get_viewport().get_visible_rect().size
-	var pos = mouse_pos + offset
 	
-	# Keep the tooltip on screen
-	if pos.x + tooltip_size.x > viewport_size.x:
-		pos.x = mouse_pos.x - tooltip_size.x - 12
+	# Always position tooltip to the left of the mouse for consistency
+	var pos = Vector2(mouse_pos.x - tooltip_size.x - 12, mouse_pos.y + 18)
+	
+	# Keep the tooltip on screen vertically
 	if pos.y + tooltip_size.y > viewport_size.y:
 		pos.y = mouse_pos.y - tooltip_size.y - 12
 	pos.x = max(pos.x, 4)

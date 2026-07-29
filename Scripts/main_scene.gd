@@ -27,13 +27,18 @@ const GEAR_SLOT_NAMES: Array[String] = [
 @onready var mana_value_label: Label = $GameUI/StatsPanel/ManaValueLabel
 @onready var damage_value_label: Label = $GameUI/StatsPanel/DamageValueLabel
 @onready var spirit_value_label: Label = $GameUI/StatsPanel/SpiritValueLabel
+@onready var haste_value_label: Label = $GameUI/StatsPanel/HasteValueLabel
 var is_stats_open = false
 
 # Player HUD
-@onready var hud_portrait: Sprite2D = $PlayerHUD/Portrait
-@onready var hud_level_label: Label = $PlayerHUD/LevelLabel
-@onready var hud_exp_bar: ProgressBar = $PlayerHUD/ExpBar
-@onready var hud_exp_label: Label = $PlayerHUD/ExpLabel
+@onready var hud_portrait: TextureRect = $PlayerHUD/FrameBackground/Portrait
+@onready var hud_name_label: Label = $PlayerHUD/FrameBackground/NameLabel
+@onready var hud_level_label: Label = $PlayerHUD/FrameBackground/LevelLabel
+@onready var hud_health_bar: ProgressBar = $PlayerHUD/FrameBackground/HealthBar
+@onready var hud_health_label: Label = $PlayerHUD/FrameBackground/HealthBar/HealthLabel
+@onready var hud_mana_bar: ProgressBar = $PlayerHUD/FrameBackground/ManaBar
+@onready var hud_mana_label: Label = $PlayerHUD/FrameBackground/ManaBar/ManaLabel
+@onready var hud_exp_bar: ProgressBar = $PlayerHUD/FrameBackground/ExpBar
 
 # Background music
 @onready var background_music: AudioStreamPlayer = $BackgroundMusic
@@ -83,6 +88,7 @@ func _on_close_inventory_pressed() -> void:
 
 func _on_equipment_button_pressed() -> void:
 	UISound.play_click()
+	equipment_button.release_focus()  # Prevent space from toggling the button
 	is_equipment_open = !is_equipment_open
 	equipment_panel.visible = is_equipment_open
 	if is_equipment_open:
@@ -95,6 +101,7 @@ func _on_close_equipment_pressed() -> void:
 
 func _on_stats_button_pressed() -> void:
 	UISound.play_click()
+	stats_button.release_focus()  # Prevent space from toggling the button
 	is_stats_open = !is_stats_open
 	stats_panel.visible = is_stats_open
 	if is_stats_open:
@@ -110,6 +117,7 @@ func refresh_stats_display() -> void:
 	mana_value_label.text = str(int(GameState.player_current_mana)) + " / " + str(int(GameState.player_max_mana))
 	damage_value_label.text = str(int(GameState.player_base_damage))
 	spirit_value_label.text = str(int(GameState.player_spirit))
+	haste_value_label.text = str(int(GameState.player_haste))
 
 func _setup_inventory_slots() -> void:
 	# Collect all inventory slot panels
@@ -182,8 +190,15 @@ func _refresh_equipment_display() -> void:
 		var icon_rect = slot.get_node_or_null("ItemIcon")
 		if not icon_rect:
 			continue
+		
 		var equipped_item = GameState.get_equipped_item(slot_name)
 		icon_rect.texture = equipped_item.icon if equipped_item else null
+		
+		# Hide/show the label based on whether an item is equipped
+		var label_name = slot_name.replace("Slot", "Label")
+		var label = equipment_panel.get_node_or_null(label_name)
+		if label:
+			label.visible = (equipped_item == null)  # Show label only when slot is empty
 
 func _on_gear_slot_gui_input(event: InputEvent, slot_name: String) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
@@ -200,6 +215,7 @@ func _on_gear_slot_mouse_entered(slot_name: String) -> void:
 
 func _on_bag_button_pressed() -> void:
 	UISound.play_click()
+	bag_button.release_focus()  # Prevent space from toggling the button
 	is_inventory_open = !is_inventory_open
 	inventory_panel.visible = is_inventory_open
 	if is_inventory_open:
@@ -225,8 +241,7 @@ func _refresh_inventory_display() -> void:
 			var label = inventory_slots[i].get_node_or_null("ItemLabel")
 			var icon_rect = inventory_slots[i].get_node_or_null("ItemIcon")
 			if label:
-				label.text = item.item_name
-				label.add_theme_color_override("font_color", Color(1, 1, 1))
+				label.visible = false  # Hide item names in inventory, show only icons
 			if icon_rect:
 				icon_rect.texture = item.icon
 
@@ -235,7 +250,7 @@ func _on_item_slot_gui_input(event: InputEvent, slot_index: int) -> void:
 		if slot_index < GameState.player_inventory.size():
 			var item = GameState.player_inventory[slot_index]
 			if item and item.equip_slot != Item.EquipSlot.NONE and not GameState.is_item_equipped(item):
-				GameState.equip_item(item)
+				GameState.equip_item(item, slot_index)  # Pass the specific slot index
 				_refresh_inventory_display()
 				_refresh_equipment_display()
 				refresh_stats_display()
@@ -302,13 +317,31 @@ func _position_inventory_tooltip() -> void:
 	
 	inventory_tooltip.position = Vector2(x, y)
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if inventory_tooltip_visible:
 		_position_inventory_tooltip()
+	
+	# Regenerate mana in the overworld based on spirit stat
+	if GameState.player_current_mana < GameState.player_max_mana:
+		var mana_per_second = GameState.player_spirit * GameState.spirit_to_mana_multiplier
+		GameState.player_current_mana = min(
+			GameState.player_current_mana + mana_per_second * delta,
+			GameState.player_max_mana
+		)
+		# Update the mana bar display
+		hud_mana_bar.value = GameState.player_current_mana
+		hud_mana_label.text = str(int(GameState.player_current_mana)) + " / " + str(int(GameState.player_max_mana))
 
 func update_player_hud() -> void:
 	# Update HUD elements with current GameState values
-	hud_level_label.text = "Level " + str(GameState.player_level)
+	hud_level_label.text = "Lv. " + str(GameState.player_level)
 	hud_exp_bar.max_value = GameState.player_exp_to_next_level
 	hud_exp_bar.value = GameState.player_current_exp
-	hud_exp_label.text = str(int(GameState.player_current_exp)) + " / " + str(int(GameState.player_exp_to_next_level))
+	
+	hud_health_bar.max_value = GameState.player_max_health
+	hud_health_bar.value = GameState.player_current_health
+	hud_health_label.text = str(int(GameState.player_current_health)) + " / " + str(int(GameState.player_max_health))
+	
+	hud_mana_bar.max_value = GameState.player_max_mana
+	hud_mana_bar.value = GameState.player_current_mana
+	hud_mana_label.text = str(int(GameState.player_current_mana)) + " / " + str(int(GameState.player_max_mana))

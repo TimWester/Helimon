@@ -1,0 +1,111 @@
+[gd_scene format=3 uid="uid://ewyove2aeuds"]
+
+[ext_resource type="Script" uid="uid://huak0r06nxv3" path="res://Scripts/treasure_chest.gd" id="1_chest_script"]
+[ext_resource type="Texture2D" uid="uid://dk7gjxfg20al4" path="res://Sprites/WorldObject/Interactables/TreasureChest.png" id="2_chest_texture"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_interaction"]
+radius = 59.07622
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sgg2c"]
+size = Vector2(49, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward_bg"]
+bg_color = Color(0.15, 0.1, 0.08, 0.95)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.75, 0.6, 0.35, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="TreasureChest" type="Node2D" unique_id=2143771847]
+y_sort_enabled = true
+script = ExtResource("1_chest_script")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1904481655]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_chest_texture")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=149435620]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1495351320]
+shape = SubResource("CircleShape2D_interaction")
+
+[node name="PromptLabel" type="Label" parent="." unique_id=1034226699]
+offset_left = -60.0
+offset_top = -50.0
+offset_right = 60.0
+offset_bottom = -30.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 12
+text = "Press SPACE to open"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=431321566]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1610381508]
+position = Vector2(-0.5, 3)
+shape = SubResource("RectangleShape2D_sgg2c")
+
+[node name="OpenSoundPlayer" type="AudioStreamPlayer" parent="." unique_id=1610381514]
+bus = &"Master"
+
+[node name="RewardLayer" type="CanvasLayer" parent="." unique_id=1610381509]
+layer = 100
+visible = false
+
+[node name="RewardPopup" type="Panel" parent="RewardLayer" unique_id=1610381510]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -120.0
+offset_right = 200.0
+offset_bottom = 120.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_reward_bg")
+
+[node name="TitleLabel" type="Label" parent="RewardLayer/RewardPopup" unique_id=1610381511]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 380.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 28
+text = "Treasure Found!"
+horizontal_alignment = 1
+
+[node name="ItemsLabel" type="Label" parent="RewardLayer/RewardPopup" unique_id=1610381512]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 80.0
+offset_right = 360.0
+offset_bottom = 160.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 20
+text = "Item Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="ContinueButton" type="Button" parent="RewardLayer/RewardPopup" unique_id=1610381513]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 180.0
+offset_right = 280.0
+offset_bottom = 220.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "Continue"

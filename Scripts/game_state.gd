@@ -1,5 +1,15 @@
 extends Node
 
+## Global stat scaling configuration
+## Edit these values in the Inspector (select GameState autoload) to adjust how stats scale/convert
+@export_group("Stat Configuration")
+## How much mana regeneration per spirit point per second (1.0 = 1 mana/sec per spirit)
+@export var spirit_to_mana_multiplier: float = 1.0
+## Cast time reduction percentage per haste point (1.0 = 1% faster per haste)
+@export var haste_cast_speed_per_point: float = 2.5
+## Cooldown reduction percentage per haste point (0.5 = 0.5% faster per haste)
+@export var haste_cooldown_per_point: float = 2.5
+
 # Track which enemy node was encountered
 var current_enemy_path: NodePath = NodePath()
 var enemy_defeated: bool = false
@@ -17,6 +27,7 @@ var encounter_enemy_attack_sheet: Texture2D = null
 var encounter_enemy_attack_frame_count: int = 5
 var encounter_enemy_projectile_sheet: Texture2D = null
 var encounter_enemy_projectile_frame_count: int = 3
+var encounter_enemy_is_aoe: bool = false
 
 # Item reward from the current encounter
 var encounter_item_rewards: Array[Item] = []
@@ -44,6 +55,7 @@ var player_max_mana: float = 50.0
 var player_current_mana: float = 50.0
 var player_base_damage: float = 10.0
 var player_spirit: float = 5.0
+var player_haste: float = 0.0  # Reduces cast time and cooldowns
 var player_level: int = 1
 var player_current_exp: float = 0.0
 var player_exp_to_next_level: float = 100.0
@@ -55,6 +67,7 @@ var level_health_gains: Array[float] = []
 var level_mana_gains: Array[float] = []
 var level_damage_gains: Array[float] = []
 var level_spirit_gains: Array[float] = []
+var level_haste_gains: Array[float] = []
 var level_exp_requirements: Array[float] = []
 
 func set_enemy(
@@ -69,7 +82,8 @@ func set_enemy(
 	attack_frame_count: int = 5,
 	projectile_sheet: Texture2D = null,
 	projectile_frame_count: int = 3,
-	item_rewards: Array[Item] = []
+	item_rewards: Array[Item] = [],
+	is_aoe: bool = false
 ) -> void:
 	current_enemy_path = enemy_node_path
 	player_return_position = player_position
@@ -84,6 +98,7 @@ func set_enemy(
 	encounter_enemy_projectile_sheet = projectile_sheet
 	encounter_enemy_projectile_frame_count = projectile_frame_count
 	encounter_item_rewards = item_rewards.duplicate()
+	encounter_enemy_is_aoe = is_aoe
 
 func mark_enemy_defeated() -> void:
 	enemy_defeated = true
@@ -118,12 +133,13 @@ func reset_run() -> void:
 	_ensure_inventory_capacity()
 	player_equipped_slots.clear()
 
-func set_leveling_data(max_lvl: int, health_gains: Array[float], mana_gains: Array[float], damage_gains: Array[float], spirit_gains: Array[float], exp_requirements: Array[float]) -> void:
+func set_leveling_data(max_lvl: int, health_gains: Array[float], mana_gains: Array[float], damage_gains: Array[float], spirit_gains: Array[float], haste_gains: Array[float], exp_requirements: Array[float]) -> void:
 	player_max_level = max_lvl
 	level_health_gains = health_gains
 	level_mana_gains = mana_gains
 	level_damage_gains = damage_gains
 	level_spirit_gains = spirit_gains
+	level_haste_gains = haste_gains
 	level_exp_requirements = exp_requirements
 
 # Grants experience to the player, applying as many level ups as the exp
@@ -158,6 +174,8 @@ func _apply_level_up_stats(new_level: int) -> void:
 		player_base_damage += level_damage_gains[index]
 	if index >= 0 and index < level_spirit_gains.size():
 		player_spirit += level_spirit_gains[index]
+	if index >= 0 and index < level_haste_gains.size():
+		player_haste += level_haste_gains[index]
 	
 	# Fully restore health and mana on level up
 	player_current_health = player_max_health
@@ -225,25 +243,27 @@ func get_equipped_item(slot_name: String) -> Item:
 ## Equip an item into its matching gear slot, applying its stat bonuses and
 ## removing it from the bag. If another item already occupies that slot, it
 ## is unequipped first and returned to the bag.
-func equip_item(item: Item) -> void:
+func equip_item(item: Item, from_slot_index: int = -1) -> void:
 	if not item or is_item_equipped(item):
 		return
 	var slot_name = find_slot_for_item(item)
 	if slot_name == "":
 		return
-	
+
 	if player_equipped_slots.has(slot_name):
 		var old_item: Item = player_equipped_slots[slot_name]
 		if old_item:
 			old_item.remove_stats()
 			add_item_to_inventory(old_item)
-	
+
 	player_equipped_slots[slot_name] = item
 	item.apply_stats()
 	# Clear the item's bag slot (set to null) rather than erase, so the
 	# other items don't shift position.
-	var bag_index = player_inventory.find(item)
-	if bag_index != -1:
+	# Use the provided slot index if available (for duplicate items),
+	# otherwise search for it
+	var bag_index = from_slot_index if from_slot_index != -1 else player_inventory.find(item)
+	if bag_index != -1 and bag_index < player_inventory.size():
 		player_inventory[bag_index] = null
 
 ## Unequip an item, remove its stat bonuses, free up its gear slot, and

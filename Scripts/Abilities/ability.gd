@@ -25,6 +25,18 @@ var is_showing_disabled: bool = false
 var enabled_sprite_scale: Vector2 = Vector2.ONE
 var disabled_sprite_scale: Vector2 = Vector2.ONE
 
+func get_modified_cast_time() -> float:
+	## Returns cast time reduced by haste percentage
+	var haste_percent = GameState.player_haste * GameState.haste_cast_speed_per_point / 100.0
+	var reduction = 1.0 - clamp(haste_percent, 0.0, 0.75)  # Cap at 75% reduction
+	return cast_time * reduction
+
+func get_modified_cooldown() -> float:
+	## Returns cooldown reduced by haste percentage
+	var haste_percent = GameState.player_haste * GameState.haste_cooldown_per_point / 100.0
+	var reduction = 1.0 - clamp(haste_percent, 0.0, 0.75)  # Cap at 75% reduction
+	return cooldown_duration * reduction
+
 func _ready() -> void:
 	# Find child nodes
 	sprite = get_node_or_null("Sprite2D")
@@ -46,7 +58,7 @@ func _ready() -> void:
 			disabled_sprite_scale = enabled_sprite_scale * size_ratio
 	
 	if cooldown_bar:
-		cooldown_bar.max_value = cooldown_duration
+		cooldown_bar.max_value = get_modified_cooldown()
 		cooldown_bar.value = 0.0
 		cooldown_bar.visible = false
 	
@@ -66,7 +78,8 @@ func _process(delta: float) -> void:
 		else:
 			cast_remaining -= delta
 			if encounter_scene and encounter_scene.has_method("update_casting"):
-				var progress = 1.0 - (cast_remaining / max(cast_time, 0.001))
+				var modified_cast_time = get_modified_cast_time()
+				var progress = 1.0 - (cast_remaining / max(modified_cast_time, 0.001))
 				encounter_scene.update_casting(progress)
 			
 			if cast_remaining <= 0.0:
@@ -154,7 +167,8 @@ func use_ability() -> void:
 		if not encounter_scene.use_mana(mana_cost):
 			return  # Not enough mana
 	
-	if cast_time > 0.0:
+	var modified_cast_time = get_modified_cast_time()
+	if modified_cast_time > 0.0:
 		_begin_cast()
 	else:
 		perform_effect()
@@ -162,9 +176,10 @@ func use_ability() -> void:
 
 func _begin_cast() -> void:
 	is_casting = true
-	cast_remaining = cast_time
+	var modified_cast_time = get_modified_cast_time()
+	cast_remaining = modified_cast_time
 	if encounter_scene and encounter_scene.has_method("start_casting"):
-		encounter_scene.start_casting(ability_name, cast_time)
+		encounter_scene.start_casting(ability_name, modified_cast_time)
 
 func _finish_cast() -> void:
 	is_casting = false
@@ -186,10 +201,12 @@ func _cancel_cast() -> void:
 
 func _start_cooldown() -> void:
 	is_on_cooldown = true
-	cooldown_remaining = cooldown_duration
+	var modified_cooldown = get_modified_cooldown()
+	cooldown_remaining = modified_cooldown
 	if cooldown_bar:
+		cooldown_bar.max_value = modified_cooldown
 		cooldown_bar.visible = true
-		cooldown_bar.value = cooldown_duration
+		cooldown_bar.value = modified_cooldown
 
 func perform_effect() -> void:
 	# Override this in child classes to implement specific ability effects
@@ -197,27 +214,36 @@ func perform_effect() -> void:
 
 func get_tooltip_text() -> String:
 	var lines: PackedStringArray = []
-	lines.append(ability_name)
+	lines.append("[color=#FFD700]%s[/color]" % ability_name)  # Gold name
 	lines.append("")
 	if description.strip_edges() != "":
 		lines.append(description.strip_edges())
 		lines.append("")
-	lines.append("Key: " + _get_key_text())
-	lines.append("Mana Cost: " + str(int(mana_cost)))
+	
+	lines.append("[color=#4DA6FF]Mana Cost: %d[/color]" % int(mana_cost))  # Blue
+	
+	var modified_cast_time = get_modified_cast_time()
 	if cast_time > 0.0:
-		lines.append("Cast Time: " + str(snapped(cast_time, 0.1)) + " sec")
+		if modified_cast_time > 0.0:
+			lines.append("[color=#90EE90]Cast Time: %.2f sec[/color]" % modified_cast_time)  # Green
+		else:
+			lines.append("[color=#90EE90]Cast Time: Instant[/color]")
 	else:
-		lines.append("Cast Time: Instant")
-	lines.append("Cooldown: " + str(snapped(cooldown_duration, 0.1)) + " sec")
+		lines.append("[color=#90EE90]Cast Time: Instant[/color]")
+	
+	var modified_cooldown = get_modified_cooldown()
+	lines.append("[color=#FFA500]Cooldown: %.2f sec[/color]" % modified_cooldown)  # Orange
+	
 	return "\n".join(lines)
 
 func _on_mouse_entered() -> void:
 	if encounter_scene and encounter_scene.has_method("show_ability_tooltip"):
-		encounter_scene.show_ability_tooltip(get_tooltip_text())
+		# Use call_deferred to ensure this happens after other events settle
+		encounter_scene.call_deferred("show_ability_tooltip", get_tooltip_text())
 
 func _on_mouse_exited() -> void:
 	if encounter_scene and encounter_scene.has_method("hide_ability_tooltip"):
-		encounter_scene.hide_ability_tooltip()
+		encounter_scene.call_deferred("hide_ability_tooltip")
 
 func update_key_label() -> void:
 	if not key_label:
