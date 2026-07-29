@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://pcns541ywh3g"]
+
+[ext_resource type="Script" uid="uid://b5v3qx8yt2ml7" path="res://Scripts/Items/item.gd" id="1_7xwqf"]
+
+[resource]
+script = ExtResource("1_7xwqf")
+item_name = "Leather Tunic"
+description = "A normal leather tunic. 
+Health: 20"
+equip_slot = 6
+health_bonus = 20.0

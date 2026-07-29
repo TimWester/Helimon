@@ -36,3 +36,22 @@ func perform_effect() -> void:
 		encounter_scene.show_heal_number(heal_amount, member.global_position)
 	
 	encounter_scene.play_heal_sound()
+
+func get_tooltip_text() -> String:
+	var lines: PackedStringArray = []
+	lines.append(ability_name)
+	lines.append("")
+	if description.strip_edges() != "":
+		lines.append(description.strip_edges())
+		lines.append("")
+	lines.append("Healing: " + str(int(heal_amount)))
+	lines.append("Key: " + _get_key_text())
+	lines.append("Mana Cost: " + str(int(mana_cost)))
+	if cast_time > 0.0:
+		lines.append("Cast Time: " + str(snapped(cast_time, 0.1)) + " sec")
+	else:
+		lines.append("Cast Time: Instant")
+	lines.append("Cooldown: " + str(snapped(cooldown_duration, 0.1)) + " sec")
+	lines.append("")
+	lines.append("Requires a selected party member.")
+	return "\n".join(lines)

@@ -47,23 +47,23 @@ func _physics_process(_delta: float) -> void:
 	
 	if Input.is_key_pressed(KEY_W):
 		input_velocity.y -= 1
-		if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_up"):
+		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_up"):
 			animated_sprite.play("walk_up")
 	elif Input.is_key_pressed(KEY_S):
 		input_velocity.y += 1
-		if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_down"):
+		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_down"):
 			animated_sprite.play("walk_down")
 	elif Input.is_key_pressed(KEY_A):
 		input_velocity.x -= 1
-		if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_left"):
+		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_left"):
 			animated_sprite.play("walk_left")
 	elif Input.is_key_pressed(KEY_D):
 		input_velocity.x += 1
-		if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_right"):
+		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_right"):
 			animated_sprite.play("walk_right")
 	else:
 		# Stop animation when not moving
-		if animated_sprite.is_playing():
+		if animated_sprite and animated_sprite.is_playing():
 			animated_sprite.stop()
 	
 	# Apply deadzone to filter controller drift

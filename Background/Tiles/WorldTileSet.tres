@@ -1,0 +1,38 @@
+[gd_resource type="TileSet" format=3 uid="uid://dq5thgxqwe8a5"]
+
+[ext_resource type="Texture2D" uid="uid://cqy0ntogdxvfl" path="res://Background/Tiles/placeholder_ground.png" id="1_ground"]
+[ext_resource type="Texture2D" uid="uid://0anxn6byike3" path="res://Background/Tiles/placeholder_obstacles.png" id="2_obstacles"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ground"]
+texture = ExtResource("1_ground")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_obstacles"]
+texture = ExtResource("2_obstacles")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+0:0/0/y_sort_origin = 24
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-18, -8, 18, -8, 18, 28, -18, 28)
+1:0/0 = 0
+1:0/0/y_sort_origin = 24
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-22, 4, 22, 4, 22, 28, -22, 28)
+2:0/0 = 0
+2:0/0/y_sort_origin = 24
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-18, 4, 18, 4, 18, 28, -18, 28)
+3:0/0 = 0
+3:0/0/y_sort_origin = 24
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-24, 4, 24, 4, 24, 28, -24, 28)
+
+[resource]
+tile_size = Vector2i(64, 64)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_ground")
+sources/1 = SubResource("TileSetAtlasSource_obstacles")

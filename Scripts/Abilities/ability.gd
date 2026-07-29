@@ -3,7 +3,9 @@ class_name Ability
 
 @export_group("Ability Settings")
 @export var ability_name: String = "Ability"
+@export_multiline var description: String = ""
 @export var cooldown_duration: float = 5.0
+@export var cast_time: float = 0.0
 @export var keybinding: Key = KEY_1
 @export var mana_cost: float = 10.0
 @export var disabled_texture: Texture2D
@@ -14,6 +16,8 @@ class_name Ability
 
 var cooldown_remaining: float = 0.0
 var is_on_cooldown: bool = false
+var cast_remaining: float = 0.0
+var is_casting: bool = false
 var key_was_pressed: bool = false
 var encounter_scene: Node2D  # Reference to encounter scene for mana checks
 var enabled_texture: Texture2D
@@ -44,18 +48,35 @@ func _ready() -> void:
 	if cooldown_bar:
 		cooldown_bar.max_value = cooldown_duration
 		cooldown_bar.value = 0.0
+		cooldown_bar.visible = false
 	
 	if key_label:
 		update_key_label()
 	
 	# Connect input event
 	input_event.connect(_on_input_event)
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
 
 func _process(delta: float) -> void:
+	# Update active cast
+	if is_casting:
+		if encounter_scene and encounter_scene.get("is_battle_over"):
+			_cancel_cast()
+		else:
+			cast_remaining -= delta
+			if encounter_scene and encounter_scene.has_method("update_casting"):
+				var progress = 1.0 - (cast_remaining / max(cast_time, 0.001))
+				encounter_scene.update_casting(progress)
+			
+			if cast_remaining <= 0.0:
+				_finish_cast()
+	
 	# Update cooldown
 	if is_on_cooldown:
 		cooldown_remaining -= delta
 		if cooldown_bar:
+			cooldown_bar.visible = true
 			cooldown_bar.value = cooldown_remaining
 		
 		if cooldown_remaining <= 0:
@@ -63,6 +84,7 @@ func _process(delta: float) -> void:
 			cooldown_remaining = 0.0
 			if cooldown_bar:
 				cooldown_bar.value = 0.0
+				cooldown_bar.visible = false
 	
 	update_sprite_state()
 	
@@ -75,12 +97,12 @@ func _process(delta: float) -> void:
 		key_was_pressed = false
 
 func update_sprite_state() -> void:
-	# Swap to the disabled sprite while on cooldown or lacking enough mana
+	# Swap to the disabled sprite while on cooldown, casting, or lacking enough mana
 	if not sprite or not disabled_texture:
 		return
 	
 	var out_of_mana = encounter_scene and not encounter_scene.has_mana(mana_cost)
-	var should_show_disabled = is_on_cooldown or out_of_mana
+	var should_show_disabled = is_on_cooldown or is_casting or out_of_mana
 	
 	if should_show_disabled != is_showing_disabled:
 		is_showing_disabled = should_show_disabled
@@ -95,7 +117,9 @@ func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> voi
 
 func try_use() -> void:
 	# Attempt to use the ability, giving feedback when blocked by insufficient mana
-	if is_on_cooldown:
+	if is_on_cooldown or is_casting:
+		return
+	if encounter_scene and encounter_scene.has_method("is_any_ability_casting") and encounter_scene.is_any_ability_casting():
 		return
 	if encounter_scene and not encounter_scene.has_mana(mana_cost):
 		if encounter_scene.has_method("show_out_of_mana_message"):
@@ -106,8 +130,10 @@ func try_use() -> void:
 	use_ability()
 
 func can_use() -> bool:
-	# Check cooldown, valid target, and mana
-	if is_on_cooldown:
+	# Check cooldown, casting, valid target, and mana
+	if is_on_cooldown or is_casting:
+		return false
+	if encounter_scene and encounter_scene.has_method("is_any_ability_casting") and encounter_scene.is_any_ability_casting():
 		return false
 	if not has_valid_target():
 		return false
@@ -123,39 +149,89 @@ func use_ability() -> void:
 	if not can_use():
 		return
 	
-	# Consume mana
+	# Consume mana up front when the cast/use begins
 	if encounter_scene:
 		if not encounter_scene.use_mana(mana_cost):
 			return  # Not enough mana
 	
-	# Perform the ability effect (override in child classes)
-	perform_effect()
+	if cast_time > 0.0:
+		_begin_cast()
+	else:
+		perform_effect()
+		_start_cooldown()
+
+func _begin_cast() -> void:
+	is_casting = true
+	cast_remaining = cast_time
+	if encounter_scene and encounter_scene.has_method("start_casting"):
+		encounter_scene.start_casting(ability_name, cast_time)
+
+func _finish_cast() -> void:
+	is_casting = false
+	cast_remaining = 0.0
+	if encounter_scene and encounter_scene.has_method("stop_casting"):
+		encounter_scene.stop_casting()
 	
-	# Start cooldown
+	# Target may have been deselected during the cast — still finish if valid
+	if has_valid_target():
+		perform_effect()
+	_start_cooldown()
+
+func _cancel_cast() -> void:
+	# Interrupted (e.g. battle ended) — no effect, no cooldown refund of mana
+	is_casting = false
+	cast_remaining = 0.0
+	if encounter_scene and encounter_scene.has_method("stop_casting"):
+		encounter_scene.stop_casting()
+
+func _start_cooldown() -> void:
 	is_on_cooldown = true
 	cooldown_remaining = cooldown_duration
 	if cooldown_bar:
+		cooldown_bar.visible = true
 		cooldown_bar.value = cooldown_duration
 
 func perform_effect() -> void:
 	# Override this in child classes to implement specific ability effects
 	print(ability_name + " used!")
 
+func get_tooltip_text() -> String:
+	var lines: PackedStringArray = []
+	lines.append(ability_name)
+	lines.append("")
+	if description.strip_edges() != "":
+		lines.append(description.strip_edges())
+		lines.append("")
+	lines.append("Key: " + _get_key_text())
+	lines.append("Mana Cost: " + str(int(mana_cost)))
+	if cast_time > 0.0:
+		lines.append("Cast Time: " + str(snapped(cast_time, 0.1)) + " sec")
+	else:
+		lines.append("Cast Time: Instant")
+	lines.append("Cooldown: " + str(snapped(cooldown_duration, 0.1)) + " sec")
+	return "\n".join(lines)
+
+func _on_mouse_entered() -> void:
+	if encounter_scene and encounter_scene.has_method("show_ability_tooltip"):
+		encounter_scene.show_ability_tooltip(get_tooltip_text())
+
+func _on_mouse_exited() -> void:
+	if encounter_scene and encounter_scene.has_method("hide_ability_tooltip"):
+		encounter_scene.hide_ability_tooltip()
+
 func update_key_label() -> void:
 	if not key_label:
 		return
-	
-	# Convert key enum to display text
-	var key_text = ""
+	key_label.text = _get_key_text()
+
+func _get_key_text() -> String:
 	match keybinding:
-		KEY_1: key_text = "1"
-		KEY_2: key_text = "2"
-		KEY_3: key_text = "3"
-		KEY_4: key_text = "4"
-		KEY_Q: key_text = "Q"
-		KEY_E: key_text = "E"
-		KEY_R: key_text = "R"
-		KEY_F: key_text = "F"
-		_: key_text = str(keybinding)
-	
-	key_label.text = key_text
+		KEY_1: return "1"
+		KEY_2: return "2"
+		KEY_3: return "3"
+		KEY_4: return "4"
+		KEY_Q: return "Q"
+		KEY_E: return "E"
+		KEY_R: return "R"
+		KEY_F: return "F"
+		_: return str(keybinding)

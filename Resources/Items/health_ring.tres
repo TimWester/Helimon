@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://diup8ft8285aa"]
+
+[ext_resource type="Script" path="res://Scripts/Items/item.gd" id="1_healthring"]
+
+[resource]
+script = ExtResource("1_healthring")
+item_name = "Ring of Vitality"
+description = "A sturdy ring that increases the wearer's maximum health."
+icon = null
+item_type = 0
+equip_slot = 5
+spirit_bonus = 0.0
+health_bonus = 25.0
+mana_bonus = 0.0
+damage_bonus = 0.0

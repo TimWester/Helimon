@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://ofnig3to8eqq"]
+
+[ext_resource type="Script" path="res://Scripts/Items/item.gd" id="1_manaamulet"]
+
+[resource]
+script = ExtResource("1_manaamulet")
+item_name = "Amulet of the Arcane"
+description = "An enchanted amulet that expands the wearer's mana pool."
+icon = null
+item_type = 0
+equip_slot = 1
+spirit_bonus = 0.0
+health_bonus = 0.0
+mana_bonus = 20.0
+damage_bonus = 0.0

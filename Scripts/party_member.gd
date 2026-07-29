@@ -53,7 +53,12 @@ func deselect() -> void:
 func on_defeated() -> void:
 	print(member_name + " defeated!")
 
+func is_alive() -> bool:
+	return current_health > 0
+
 func can_attack(delta: float) -> bool:
+	if not is_alive():
+		return false
 	time_since_attack += delta
 	if time_since_attack >= attack_interval:
 		time_since_attack = 0.0

@@ -7,70 +7,29 @@
 [ext_resource type="Texture2D" uid="uid://bomsr2y5g1oyb" path="res://Sprites/UI/Portrait.png" id="7_portrait"]
 [ext_resource type="Texture2D" uid="uid://cwalkleft001" path="res://Sprites/Characters/PlayerWalkLeft.png" id="8_walk_left"]
 [ext_resource type="Texture2D" uid="uid://cwalkright001" path="res://Sprites/Characters/PlayerWalkRight.png" id="9_walk_right"]
+[ext_resource type="Script" uid="uid://b5v3qx8yt2ml7" path="res://Scripts/Items/item.gd" id="10_2ebs2"]
 [ext_resource type="Texture2D" uid="uid://cwalkback001" path="res://Sprites/Characters/PlayerWalkBack.png" id="10_walk_back"]
+[ext_resource type="Resource" uid="uid://cbbgbaoyh44ye" path="res://Resources/Items/necklace.tres" id="11_oyb3p"]
 [ext_resource type="Texture2D" uid="uid://cwalkdown001" path="res://Sprites/Characters/PlayerWalkDown.png" id="11_walk_down"]
 [ext_resource type="AudioStream" uid="uid://d226iqx1ybj35" path="res://Music/AmbientMusic.mp3" id="12_ambient_music"]
+[ext_resource type="Texture2D" uid="uid://d4n377iw126eo" path="res://Sprites/Ghast-Sheet.png" id="12_drdnd"]
+[ext_resource type="Resource" uid="uid://pcns541ywh3g" path="res://Resources/Items/leatherTunic.tres" id="12_jvnna"]
 [ext_resource type="TileSet" uid="uid://cwvr0il3p060p" path="res://Background/FloorTileSet.tres" id="13_floor_tileset"]
+[ext_resource type="Texture2D" uid="uid://8u06w8m4qemb" path="res://Sprites/Ghast.png" id="14_ghast"]
+[ext_resource type="TileSet" uid="uid://dq5thgxqwe8a5" path="res://Background/Tiles/WorldTileSet.tres" id="14_world_tileset"]
+[ext_resource type="Texture2D" uid="uid://6yhkdfh0v1tb" path="res://Sprites/GhastProjectile-Sheet.png" id="15_ghast_proj"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inv_bg"]
-bg_color = Color(0.2, 0.2, 0.2, 0.95)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.6, 0.4, 0.2, 1)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
+size = Vector2(800, 20)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inv_slot"]
-bg_color = Color(0.1, 0.1, 0.1, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.4, 0.4, 0.4, 1)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
+size = Vector2(20, 800)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_equip_bg"]
-bg_color = Color(0.42, 0.26, 0.14, 1)
-border_width_left = 8
-border_width_top = 8
-border_width_right = 8
-border_width_bottom = 8
-border_color = Color(0.28, 0.16, 0.08, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_200"]
+size = Vector2(200, 20)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_equip_inner"]
-bg_color = Color(0.82, 0.64, 0.42, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.55, 0.38, 0.22, 1)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_equip_slot"]
-bg_color = Color(0.68, 0.5, 0.32, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.35, 0.2, 0.1, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stats_bg"]
-bg_color = Color(0.2, 0.15, 0.1, 0.95)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.7, 0.5, 0.3, 1)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_150"]
+size = Vector2(150, 20)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_walk_down_1"]
 atlas = ExtResource("11_walk_down")
@@ -181,7 +140,113 @@ animations = [{
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
 radius = 28.0
-height = 124.0
+height = 56.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
+radius = 68.0294
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ioaeq"]
+atlas = ExtResource("12_drdnd")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ewk0"]
+atlas = ExtResource("12_drdnd")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lhp3t"]
+atlas = ExtResource("12_drdnd")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gnsmo"]
+atlas = ExtResource("12_drdnd")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_psl12"]
+atlas = ExtResource("12_drdnd")
+region = Rect2(512, 0, 128, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_sgg2c"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ioaeq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ewk0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lhp3t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gnsmo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_psl12")
+}],
+"loop": 1,
+"name": &"Ghast",
+"speed": 5.0
+}]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inv_bg"]
+bg_color = Color(0.2, 0.2, 0.2, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.6, 0.4, 0.2, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inv_slot"]
+bg_color = Color(0.1, 0.1, 0.1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.4, 0.4, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_equip_bg"]
+bg_color = Color(0.42, 0.26, 0.14, 1)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 8
+border_width_bottom = 8
+border_color = Color(0.28, 0.16, 0.08, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_equip_inner"]
+bg_color = Color(0.82, 0.64, 0.42, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.38, 0.22, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_equip_slot"]
+bg_color = Color(0.68, 0.5, 0.32, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.35, 0.2, 0.1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stats_bg"]
+bg_color = Color(0.2, 0.15, 0.1, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.7, 0.5, 0.3, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_exp_bg"]
 bg_color = Color(0.1, 0.1, 0.1, 0.8)
@@ -194,28 +259,174 @@ border_color = Color(0.5, 0.5, 0.5, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_exp_fill"]
 bg_color = Color(0.8, 0.6, 0.2, 1)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
-size = Vector2(800, 20)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
-size = Vector2(20, 800)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_200"]
-size = Vector2(200, 20)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_150"]
-size = Vector2(150, 20)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
-radius = 30.0
-
 [node name="MainScene" type="Node2D" unique_id=20060739]
 script = ExtResource("6_main_script")
 
-[node name="BackgroundMusic" type="AudioStreamPlayer" parent="." unique_id=362283070]
-stream = ExtResource("12_ambient_music")
-volume_db = -8.0
-autoplay = true
+[node name="Maze" type="Node2D" parent="." unique_id=90258774]
+
+[node name="WallBottom" type="StaticBody2D" parent="Maze" unique_id=80416330]
+position = Vector2(0, 400)
+
+[node name="ColorRect" type="ColorRect" parent="Maze/WallBottom" unique_id=248525573]
+offset_left = -400.0
+offset_top = -10.0
+offset_right = 400.0
+offset_bottom = 10.0
+color = Color(0.3, 0.3, 0.3, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/WallBottom" unique_id=945526781]
+shape = SubResource("RectangleShape2D_wall_h")
+
+[node name="WallLeft" type="StaticBody2D" parent="Maze" unique_id=1904990461]
+position = Vector2(-400, 0)
+
+[node name="ColorRect" type="ColorRect" parent="Maze/WallLeft" unique_id=1863317709]
+offset_left = -10.0
+offset_top = -400.0
+offset_right = 10.0
+offset_bottom = 400.0
+color = Color(0.3, 0.3, 0.3, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/WallLeft" unique_id=128925992]
+shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="WallRight" type="StaticBody2D" parent="Maze" unique_id=1596797189]
+position = Vector2(400, 0)
+
+[node name="ColorRect" type="ColorRect" parent="Maze/WallRight" unique_id=483082287]
+offset_left = -10.0
+offset_top = -400.0
+offset_right = 10.0
+offset_bottom = 400.0
+color = Color(0.3, 0.3, 0.3, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/WallRight" unique_id=1030350527]
+position = Vector2(-1, -3)
+shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="Wall1" type="StaticBody2D" parent="Maze" unique_id=1561207434]
+position = Vector2(-200, -200)
+
+[node name="ColorRect" type="ColorRect" parent="Maze/Wall1" unique_id=854531980]
+offset_left = -100.0
+offset_top = -10.0
+offset_right = 100.0
+offset_bottom = 10.0
+color = Color(0.5, 0.5, 0.5, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall1" unique_id=48080464]
+shape = SubResource("RectangleShape2D_wall_200")
+
+[node name="Wall2" type="StaticBody2D" parent="Maze" unique_id=1135258716]
+position = Vector2(200, -200)
+rotation = 1.5708
+
+[node name="ColorRect" type="ColorRect" parent="Maze/Wall2" unique_id=890742625]
+offset_left = -100.0
+offset_top = -10.0
+offset_right = 100.0
+offset_bottom = 10.0
+color = Color(0.5, 0.5, 0.5, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall2" unique_id=1720072516]
+shape = SubResource("RectangleShape2D_wall_200")
+
+[node name="Wall3" type="StaticBody2D" parent="Maze" unique_id=1370319727]
+
+[node name="ColorRect" type="ColorRect" parent="Maze/Wall3" unique_id=1951576674]
+offset_left = -100.0
+offset_top = -10.0
+offset_right = 100.0
+offset_bottom = 10.0
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall3" unique_id=410153089]
+shape = SubResource("RectangleShape2D_wall_200")
+
+[node name="Wall4" type="StaticBody2D" parent="Maze" unique_id=172210220]
+position = Vector2(-200, 100)
+rotation = 1.5708
+
+[node name="ColorRect" type="ColorRect" parent="Maze/Wall4" unique_id=1977722230]
+offset_left = -100.0
+offset_top = -10.0
+offset_right = 100.0
+offset_bottom = 10.0
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall4" unique_id=23782806]
+shape = SubResource("RectangleShape2D_wall_200")
+
+[node name="Wall5" type="StaticBody2D" parent="Maze" unique_id=350277438]
+position = Vector2(150, 200)
+
+[node name="ColorRect" type="ColorRect" parent="Maze/Wall5" unique_id=1676510463]
+offset_left = -75.0
+offset_top = -10.0
+offset_right = 75.0
+offset_bottom = 10.0
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall5" unique_id=1231805190]
+shape = SubResource("RectangleShape2D_wall_150")
+
+[node name="Wall6" type="StaticBody2D" parent="Maze" unique_id=1006226040]
+position = Vector2(100, -50)
+rotation = 1.5708
+
+[node name="ColorRect" type="ColorRect" parent="Maze/Wall6" unique_id=1833039394]
+offset_left = -75.0
+offset_top = -10.0
+offset_right = 75.0
+offset_bottom = 10.0
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall6" unique_id=854344548]
+shape = SubResource("RectangleShape2D_wall_150")
+
+[node name="Wall7" type="StaticBody2D" parent="Maze" unique_id=804770643]
+position = Vector2(-100, 250)
+
+[node name="ColorRect" type="ColorRect" parent="Maze/Wall7" unique_id=441208429]
+offset_left = -75.0
+offset_top = -10.0
+offset_right = 75.0
+offset_bottom = 10.0
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall7" unique_id=1431409684]
+shape = SubResource("RectangleShape2D_wall_150")
+
+[node name="Wall8" type="StaticBody2D" parent="Maze" unique_id=951974731]
+position = Vector2(300, 50)
+rotation = 1.5708
+
+[node name="ColorRect" type="ColorRect" parent="Maze/Wall8" unique_id=313785958]
+offset_left = -100.0
+offset_top = -10.0
+offset_right = 100.0
+offset_bottom = 10.0
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall8" unique_id=1692918887]
+shape = SubResource("RectangleShape2D_wall_200")
+
+[node name="Wall9" type="StaticBody2D" parent="Maze" unique_id=1342575257]
+position = Vector2(285, -313)
+
+[node name="ColorRect" type="ColorRect" parent="Maze/Wall9" unique_id=1517372520]
+offset_left = -100.0
+offset_top = -10.0
+offset_right = 100.0
+offset_bottom = 10.0
+color = Color(0.5, 0.5, 0.5, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall9" unique_id=2023497138]
+position = Vector2(3, 0)
+shape = SubResource("RectangleShape2D_wall_200")
 
 [node name="FloorTiles" type="TileMapLayer" parent="." unique_id=1485998937]
 z_index = -1
@@ -223,6 +434,86 @@ position = Vector2(-392.5, -544.5)
 scale = Vector2(0.29425836, 0.24960127)
 tile_map_data = PackedByteArray("AAAAAAIAAAAAAAAAAAABAAIAAAAAAAAAAAACAAIAAAAAAAAAAAACAAEAAAAAAAAAAAABAAEAAAAAAAAAAAAAAAEAAAAAAAAAAAD//wEAAAAAAAAAAAD//wIAAAAAAAAAAAD//wMAAAAAAAAAAAAAAAMAAAAAAAAAAAABAAMAAAAAAAAAAAACAAMAAAAAAAAAAAACAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAAAAAAAAAAAAD/////AAAAAAAAAAAAAP//AAAAAAAAAAABAP//AAAAAAAAAAACAP//AAAAAAAAAAACAP7/AAAAAAAAAAABAP7/AAAAAAAAAAAAAP7/AAAAAAAAAAD///7/AAAAAAAAAAD+/wIAAAAAAAAAAAD+/wMAAAAAAAAAAAD+/wQAAAAAAAAAAAD//wQAAAAAAAAAAAAAAAQAAAAAAAAAAAABAAQAAAAAAAAAAAACAAQAAAAAAAAAAAADAAQAAAAAAAAAAAADAAMAAAAAAAAAAAADAAIAAAAAAAAAAAADAAEAAAAAAAAAAAADAAAAAAAAAAAAAAD+/wEAAAAAAAAAAAD+/wAAAAAAAAAAAAD+////AAAAAAAAAAD+//7/AAAAAAAAAAADAP//AAAAAAAAAAADAP7/AAAAAAAAAAA=")
 tile_set = ExtResource("13_floor_tileset")
+
+[node name="GroundTiles" type="TileMapLayer" parent="." unique_id=253231443]
+z_index = -1
+tile_map_data = PackedByteArray("AAD8//n/AAADAAAAAAD9//n/AAADAAAAAAD+//n/AAADAAAAAAD///n/AAADAAAAAAAAAPn/AAADAAAAAAD7//n/AAADAAAAAAD6//n/AAADAAAAAAD5//n/AAADAAAAAAD4//n/AAADAAAAAAD3//n/AAADAAAAAAD2//n/AAADAAAAAAABAPn/AAADAAAAAAADAPn/AAADAAAAAAACAPn/AAADAAAAAAAEAPn/AAADAAAAAAD1//n/AAADAAAAAAD0//n/AAADAAAAAADz//n/AAADAAAAAADy//n/AAADAAAAAADx//n/AAADAAAAAADw//n/AAADAAAAAADv//n/AAADAAAAAADu//n/AAADAAAAAAA=")
+tile_set = ExtResource("14_world_tileset")
+
+[node name="WorldYSort" type="Node2D" parent="." unique_id=1091005575]
+y_sort_enabled = true
+
+[node name="ObstacleTiles" type="TileMapLayer" parent="WorldYSort" unique_id=1107969288]
+y_sort_enabled = true
+tile_map_data = PackedByteArray("AAD4//j/AQACAAAAAAD4//r/AQAAAAAAAAD1//v/AQAAAAAAAAD8//b/AQAAAAAAAAD///P/AQAAAAAAAAADAPP/AQAAAAAAAAD+//P/AQAAAAAAAAD6//T/AQAAAAAAAAD2//X/AQAAAAAAAAD6//L/AQAAAAAAAAADAPb/AQAAAAAAAAAIAPf/AQAAAAAAAAAJAPT/AQAAAAAAAAAHAPL/AQAAAAAAAAAHAPv/AQAAAAAAAAAKAPn/AQAAAAAAAAADAPX/AQADAAAAAAACAPX/AQACAAAAAAABAPP/AQACAAAAAAD8//j/AQACAAAAAAA=")
+tile_set = ExtResource("14_world_tileset")
+
+[node name="Player" type="CharacterBody2D" parent="WorldYSort" unique_id=1259087175]
+position = Vector2(-300, 300)
+script = ExtResource("2_jv6wh")
+max_mana = 100.0
+spirit = 2.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="WorldYSort/Player" unique_id=612216492]
+sprite_frames = SubResource("SpriteFrames_8n0q3")
+animation = &"walk_down"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="WorldYSort/Player" unique_id=1791077307]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldYSort/Player" unique_id=545421173]
+position = Vector2(0, 31)
+shape = SubResource("CapsuleShape2D_player")
+
+[node name="Camera2D" type="Camera2D" parent="WorldYSort/Player" unique_id=1731292551]
+
+[node name="Enemy1" type="Area2D" parent="WorldYSort" unique_id=79758841]
+position = Vector2(0, -300)
+script = ExtResource("5_enemy")
+max_health = null
+attack_damage = 30.0
+attack_interval = 4.0
+exp_reward = 70.0
+item_rewards = Array[ExtResource("10_2ebs2")]([ExtResource("11_oyb3p"), ExtResource("12_jvnna")])
+encounter_sprite = ExtResource("4_demon")
+attack_frame_count = null
+projectile_frame_count = null
+
+[node name="Sprite2D" type="Sprite2D" parent="WorldYSort/Enemy1" unique_id=1471269493]
+texture = ExtResource("4_demon")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldYSort/Enemy1" unique_id=1485156004]
+shape = SubResource("CircleShape2D_enemy")
+
+[node name="Enemy2" type="Area2D" parent="WorldYSort" unique_id=1308681340]
+position = Vector2(0, -600)
+script = ExtResource("5_enemy")
+max_health = null
+attack_damage = 20.0
+attack_interval = 2.0
+exp_reward = 40.0
+encounter_sprite = ExtResource("14_ghast")
+attack_sheet = ExtResource("12_drdnd")
+attack_frame_count = null
+projectile_sheet = ExtResource("15_ghast_proj")
+projectile_frame_count = null
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="WorldYSort/Enemy2" unique_id=770946821]
+visible = false
+sprite_frames = SubResource("SpriteFrames_sgg2c")
+animation = &"Ghast"
+frame = 2
+frame_progress = 0.39039046
+
+[node name="Sprite2D" type="Sprite2D" parent="WorldYSort/Enemy2" unique_id=1971046735]
+texture = ExtResource("14_ghast")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WorldYSort/Enemy2" unique_id=1657132734]
+shape = SubResource("CircleShape2D_enemy")
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="." unique_id=362283070]
+stream = ExtResource("12_ambient_music")
+volume_db = -8.0
+autoplay = true
 
 [node name="GameUI" type="CanvasLayer" parent="." unique_id=439720319]
 layer = 5
@@ -565,6 +856,7 @@ offset_bottom = 481.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_equip_slot")
 
 [node name="NecklaceLabel" type="Label" parent="GameUI/EquipmentPanel" unique_id=343490356]
+custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 161.0
 offset_top = 65.0
@@ -578,6 +870,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="HelmLabel" type="Label" parent="GameUI/EquipmentPanel" unique_id=303278291]
+custom_minimum_size = Vector2(76, 76)
 layout_mode = 0
 offset_left = 152.0
 offset_top = 133.0
@@ -591,6 +884,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="HandLabel" type="Label" parent="GameUI/EquipmentPanel" unique_id=1192381978]
+custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 40.0
 offset_top = 219.0
@@ -604,6 +898,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="ShoulderLabel" type="Label" parent="GameUI/EquipmentPanel" unique_id=270540815]
+custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 161.0
 offset_top = 219.0
@@ -617,6 +912,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Ring1Label" type="Label" parent="GameUI/EquipmentPanel" unique_id=1390578316]
+custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 282.0
 offset_top = 219.0
@@ -630,6 +926,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="TorsoLabel" type="Label" parent="GameUI/EquipmentPanel" unique_id=67777438]
+custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 161.0
 offset_top = 287.0
@@ -643,6 +940,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Ring2Label" type="Label" parent="GameUI/EquipmentPanel" unique_id=195960605]
+custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 282.0
 offset_top = 287.0
@@ -656,6 +954,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="LegsLabel" type="Label" parent="GameUI/EquipmentPanel" unique_id=707766960]
+custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 161.0
 offset_top = 355.0
@@ -669,6 +968,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Ring3Label" type="Label" parent="GameUI/EquipmentPanel" unique_id=2063379361]
+custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 282.0
 offset_top = 355.0
@@ -682,6 +982,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="BootsLabel" type="Label" parent="GameUI/EquipmentPanel" unique_id=1889664342]
+custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 161.0
 offset_top = 423.0
@@ -695,6 +996,7 @@ vertical_alignment = 1
 autowrap_mode = 3
 
 [node name="Ring4Label" type="Label" parent="GameUI/EquipmentPanel" unique_id=528740199]
+custom_minimum_size = Vector2(58, 58)
 layout_mode = 0
 offset_left = 282.0
 offset_top = 423.0
@@ -814,22 +1116,21 @@ theme_override_colors/font_color = Color(0.5, 1, 0.7, 1)
 theme_override_font_sizes/font_size = 22
 text = "5"
 
-[node name="Player" type="CharacterBody2D" parent="." unique_id=1259087175]
-position = Vector2(-300, 300)
-script = ExtResource("2_jv6wh")
-max_mana = 100.0
-spirit = 2.0
+[node name="InventoryTooltip" type="PanelContainer" parent="GameUI" unique_id=933182113]
+visible = false
+offset_right = 250.0
+offset_bottom = 150.0
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Player" unique_id=612216492]
-sprite_frames = SubResource("SpriteFrames_8n0q3")
-animation = &"walk_down"
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Player" unique_id=1791077307]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=545421173]
-shape = SubResource("CapsuleShape2D_player")
-
-[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1731292551]
+[node name="TooltipLabel" type="Label" parent="GameUI/InventoryTooltip" unique_id=505448051]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 14
+text = "Item Name
+Description here..."
+autowrap_mode = 2
 
 [node name="PlayerHUD" type="CanvasLayer" parent="." unique_id=521704513]
 layer = 10
@@ -869,188 +1170,3 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 1
 theme_override_font_sizes/font_size = 12
 text = "0 / 100"
-
-[node name="Maze" type="Node2D" parent="." unique_id=90258774]
-
-[node name="WallBottom" type="StaticBody2D" parent="Maze" unique_id=80416330]
-position = Vector2(0, 400)
-
-[node name="ColorRect" type="ColorRect" parent="Maze/WallBottom" unique_id=248525573]
-offset_left = -400.0
-offset_top = -10.0
-offset_right = 400.0
-offset_bottom = 10.0
-color = Color(0.3, 0.3, 0.3, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/WallBottom" unique_id=945526781]
-shape = SubResource("RectangleShape2D_wall_h")
-
-[node name="WallLeft" type="StaticBody2D" parent="Maze" unique_id=1904990461]
-position = Vector2(-400, 0)
-
-[node name="ColorRect" type="ColorRect" parent="Maze/WallLeft" unique_id=1863317709]
-offset_left = -10.0
-offset_top = -400.0
-offset_right = 10.0
-offset_bottom = 400.0
-color = Color(0.3, 0.3, 0.3, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/WallLeft" unique_id=128925992]
-shape = SubResource("RectangleShape2D_wall_v")
-
-[node name="WallRight" type="StaticBody2D" parent="Maze" unique_id=1596797189]
-position = Vector2(400, 0)
-
-[node name="ColorRect" type="ColorRect" parent="Maze/WallRight" unique_id=483082287]
-offset_left = -10.0
-offset_top = -400.0
-offset_right = 10.0
-offset_bottom = 400.0
-color = Color(0.3, 0.3, 0.3, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/WallRight" unique_id=1030350527]
-position = Vector2(-1, -3)
-shape = SubResource("RectangleShape2D_wall_v")
-
-[node name="Wall1" type="StaticBody2D" parent="Maze" unique_id=1561207434]
-position = Vector2(-200, -200)
-
-[node name="ColorRect" type="ColorRect" parent="Maze/Wall1" unique_id=854531980]
-offset_left = -100.0
-offset_top = -10.0
-offset_right = 100.0
-offset_bottom = 10.0
-color = Color(0.5, 0.5, 0.5, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall1" unique_id=48080464]
-shape = SubResource("RectangleShape2D_wall_200")
-
-[node name="Wall2" type="StaticBody2D" parent="Maze" unique_id=1135258716]
-position = Vector2(200, -200)
-rotation = 1.5708
-
-[node name="ColorRect" type="ColorRect" parent="Maze/Wall2" unique_id=890742625]
-offset_left = -100.0
-offset_top = -10.0
-offset_right = 100.0
-offset_bottom = 10.0
-color = Color(0.5, 0.5, 0.5, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall2" unique_id=1720072516]
-shape = SubResource("RectangleShape2D_wall_200")
-
-[node name="Wall3" type="StaticBody2D" parent="Maze" unique_id=1370319727]
-
-[node name="ColorRect" type="ColorRect" parent="Maze/Wall3" unique_id=1951576674]
-offset_left = -100.0
-offset_top = -10.0
-offset_right = 100.0
-offset_bottom = 10.0
-color = Color(0.5, 0.5, 0.5, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall3" unique_id=410153089]
-shape = SubResource("RectangleShape2D_wall_200")
-
-[node name="Wall4" type="StaticBody2D" parent="Maze" unique_id=172210220]
-position = Vector2(-200, 100)
-rotation = 1.5708
-
-[node name="ColorRect" type="ColorRect" parent="Maze/Wall4" unique_id=1977722230]
-offset_left = -100.0
-offset_top = -10.0
-offset_right = 100.0
-offset_bottom = 10.0
-color = Color(0.5, 0.5, 0.5, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall4" unique_id=23782806]
-shape = SubResource("RectangleShape2D_wall_200")
-
-[node name="Wall5" type="StaticBody2D" parent="Maze" unique_id=350277438]
-position = Vector2(150, 200)
-
-[node name="ColorRect" type="ColorRect" parent="Maze/Wall5" unique_id=1676510463]
-offset_left = -75.0
-offset_top = -10.0
-offset_right = 75.0
-offset_bottom = 10.0
-color = Color(0.5, 0.5, 0.5, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall5" unique_id=1231805190]
-shape = SubResource("RectangleShape2D_wall_150")
-
-[node name="Wall6" type="StaticBody2D" parent="Maze" unique_id=1006226040]
-position = Vector2(100, -50)
-rotation = 1.5708
-
-[node name="ColorRect" type="ColorRect" parent="Maze/Wall6" unique_id=1833039394]
-offset_left = -75.0
-offset_top = -10.0
-offset_right = 75.0
-offset_bottom = 10.0
-color = Color(0.5, 0.5, 0.5, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall6" unique_id=854344548]
-shape = SubResource("RectangleShape2D_wall_150")
-
-[node name="Wall7" type="StaticBody2D" parent="Maze" unique_id=804770643]
-position = Vector2(-100, 250)
-
-[node name="ColorRect" type="ColorRect" parent="Maze/Wall7" unique_id=441208429]
-offset_left = -75.0
-offset_top = -10.0
-offset_right = 75.0
-offset_bottom = 10.0
-color = Color(0.5, 0.5, 0.5, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall7" unique_id=1431409684]
-shape = SubResource("RectangleShape2D_wall_150")
-
-[node name="Wall8" type="StaticBody2D" parent="Maze" unique_id=951974731]
-position = Vector2(300, 50)
-rotation = 1.5708
-
-[node name="ColorRect" type="ColorRect" parent="Maze/Wall8" unique_id=313785958]
-offset_left = -100.0
-offset_top = -10.0
-offset_right = 100.0
-offset_bottom = 10.0
-color = Color(0.5, 0.5, 0.5, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall8" unique_id=1692918887]
-shape = SubResource("RectangleShape2D_wall_200")
-
-[node name="Wall9" type="StaticBody2D" parent="Maze" unique_id=1342575257]
-position = Vector2(285, -313)
-
-[node name="ColorRect" type="ColorRect" parent="Maze/Wall9" unique_id=1517372520]
-offset_left = -100.0
-offset_top = -10.0
-offset_right = 100.0
-offset_bottom = 10.0
-color = Color(0.5, 0.5, 0.5, 1)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Maze/Wall9" unique_id=2023497138]
-position = Vector2(3, 0)
-shape = SubResource("RectangleShape2D_wall_200")
-
-[node name="Enemy1" type="Area2D" parent="." unique_id=79758841]
-position = Vector2(0, -300)
-script = ExtResource("5_enemy")
-attack_damage = 30.0
-attack_interval = 4.0
-
-[node name="Sprite2D" type="Sprite2D" parent="Enemy1" unique_id=1471269493]
-texture = ExtResource("4_demon")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy1" unique_id=1485156004]
-shape = SubResource("CircleShape2D_enemy")
-
-[node name="Enemy2" type="Area2D" parent="." unique_id=1308681340]
-position = Vector2(0, -600)
-script = ExtResource("5_enemy")
-
-[node name="Sprite2D" type="Sprite2D" parent="Enemy2" unique_id=1971046735]
-texture = ExtResource("4_demon")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy2" unique_id=1657132734]
-shape = SubResource("CircleShape2D_enemy")
