@@ -8,6 +8,7 @@ class_name PartyMember
 
 @onready var portrait_sprite: Sprite2D
 @onready var health_bar: ProgressBar
+@onready var attack_timer_bar: ProgressBar
 @onready var attack_sprite: Sprite2D
 @onready var member_area: Area2D
 
@@ -53,10 +54,22 @@ func deselect() -> void:
 func on_defeated() -> void:
 	print(member_name + " defeated!")
 
+func is_alive() -> bool:
+	return current_health > 0
+
 func can_attack(delta: float) -> bool:
+	if not is_alive():
+		return false
 	time_since_attack += delta
+	
+	# Update the attack timer bar
+	if attack_timer_bar:
+		attack_timer_bar.value = time_since_attack
+	
 	if time_since_attack >= attack_interval:
 		time_since_attack = 0.0
+		if attack_timer_bar:
+			attack_timer_bar.value = 0.0
 		return true
 	return false
 

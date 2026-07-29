@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://brw66p4hfvqa7"]
+
+[ext_resource type="Script" path="res://Scripts/Items/item.gd" id="1_sagependant"]
+
+[resource]
+script = ExtResource("1_sagependant")
+item_name = "Sage's Pendant"
+description = "A powerful artifact that enhances multiple attributes of its wearer."
+icon = null
+item_type = 0
+equip_slot = 1
+spirit_bonus = 2.0
+health_bonus = 15.0
+mana_bonus = 10.0
+damage_bonus = 3.0

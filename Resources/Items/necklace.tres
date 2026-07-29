@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://cbbgbaoyh44ye"]
+
+[ext_resource type="Texture2D" uid="uid://dnpf36fqki3a0" path="res://Sprites/Items/Equipment/SpiritNecklaceSprite.png" id="1_jfkn2"]
+[ext_resource type="Script" uid="uid://b5v3qx8yt2ml7" path="res://Scripts/Items/item.gd" id="1_necklace"]
+
+[resource]
+script = ExtResource("1_necklace")
+item_name = "Spirit Necklace"
+description = "A mystical necklace that enhances the wearer's spiritual connection.
+"
+icon = ExtResource("1_jfkn2")
+equip_slot = 1
+spirit_bonus = 1.0

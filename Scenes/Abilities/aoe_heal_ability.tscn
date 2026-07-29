@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://x3qdg373eioh"]
+
+[ext_resource type="Script" uid="uid://dx587icv103nf" path="res://Scripts/Abilities/aoe_heal_ability.gd" id="1_aoe_heal"]
+[ext_resource type="Texture2D" uid="uid://bm8d3047c27tr" path="res://Sprites/Mass Heal.png" id="2_vxd2r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pq5cc"]
+size = Vector2(51, 53)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cd_bg"]
+bg_color = Color(0.1, 0.1, 0.1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cd_fill"]
+bg_color = Color(1, 1, 1, 1)
+
+[node name="AOEHealAbility" type="Area2D" unique_id=865472875]
+script = ExtResource("1_aoe_heal")
+ability_name = "Mass Heal"
+description = "Ability name
+[color=#FFD700]Mass Heal[/color]"
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=183900180]
+texture = ExtResource("2_vxd2r")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=281441524]
+position = Vector2(-0.5, 0.5)
+shape = SubResource("RectangleShape2D_pq5cc")
+
+[node name="CooldownBar" type="ProgressBar" parent="." unique_id=1149036578]
+offset_left = -20.0
+offset_top = -30.0
+offset_right = 20.0
+offset_bottom = -24.0
+theme_override_styles/background = SubResource("StyleBoxFlat_cd_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_cd_fill")
+max_value = 5.0
+show_percentage = false
+
+[node name="KeyLabel" type="Label" parent="." unique_id=1036040052]
+offset_left = -12.0
+offset_top = 16.0
+offset_right = 12.0
+offset_bottom = 36.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 16
+text = "3"
+horizontal_alignment = 1

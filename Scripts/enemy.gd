@@ -8,9 +8,21 @@ extends Area2D
 @export var attack_damage: float = 5.0
 @export var attack_interval: float = 1.0
 @export var exp_reward: float = 30.0
-## Optional. If left empty, this enemy's own overworld sprite texture is used
-## for the enlarged encounter sprite as well.
+@export var is_aoe_attack: bool = false  ## If true, enemy attacks all party members at once
+
+@export_group("Rewards")
+## Items dropped when this enemy is defeated (can add multiple items)
+@export var item_rewards: Array[Item] = []
+
+@export_group("Encounter Appearance")
+## Idle / default sprite shown in the encounter. If empty, uses this enemy's Sprite2D texture.
 @export var encounter_sprite: Texture2D
+## Horizontal sprite sheet played when this enemy attacks in an encounter.
+@export var attack_sheet: Texture2D
+@export var attack_frame_count: int = 5
+## Horizontal projectile sheet played to the left of the enemy during its attack.
+@export var projectile_sheet: Texture2D
+@export var projectile_frame_count: int = 3
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
@@ -24,6 +36,20 @@ func _on_body_entered(body: Node2D) -> void:
 				sprite_to_use = own_sprite.texture
 		
 		# Store this enemy's path, the player's position, and this enemy's
-		# stats before switching to the (shared) encounter scene
-		GameState.set_enemy(get_path(), body.global_position, max_health, attack_damage, attack_interval, exp_reward, sprite_to_use)
+		# stats/animations before switching to the (shared) encounter scene
+		GameState.set_enemy(
+			get_path(),
+			body.global_position,
+			max_health,
+			attack_damage,
+			attack_interval,
+			exp_reward,
+			sprite_to_use,
+			attack_sheet,
+			attack_frame_count,
+			projectile_sheet,
+			projectile_frame_count,
+			item_rewards,
+			is_aoe_attack
+		)
 		get_tree().call_deferred("change_scene_to_file", "res://Scenes/encounter_scene.tscn")
