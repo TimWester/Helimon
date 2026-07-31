@@ -42,9 +42,11 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	# Position the prompt below the player when visible
 	if player_in_range and player_reference and prompt_label and prompt_label.visible:
-		# Position the label south (below) the player
+		# Position the label south (below) the player. The player's origin is
+		# now at their feet (see main_scene.tscn Y-sort fix), so this offset
+		# is smaller than before to land in the same visual spot.
 		var player_pos = player_reference.global_position
-		prompt_label.global_position = player_pos + Vector2(-60, 50)  # 50 pixels below player
+		prompt_label.global_position = player_pos + Vector2(-60, -14)
 	
 	# Check for space key press when player is in range and chest isn't opened
 	if player_in_range and not is_opened and Input.is_action_just_pressed("ui_accept"):
@@ -98,6 +100,19 @@ func open_chest() -> void:
 	
 	# Show reward popup
 	show_reward_popup()
+	
+	# Remember that this chest was opened so it stays open (and doesn't
+	# re-grant rewards) if the overworld scene reloads later.
+	GameState.mark_chest_opened(get_path())
+
+## Restores this chest to its already-opened visual state without granting
+## rewards again or showing the reward popup. Called on scene load for
+## chests that were opened earlier in this play session.
+func restore_opened_state() -> void:
+	is_opened = true
+	sprite.texture = open_texture
+	if prompt_label:
+		prompt_label.visible = false
 
 func _refresh_main_scene_inventory() -> void:
 	# Find the main scene and refresh its inventory display if open

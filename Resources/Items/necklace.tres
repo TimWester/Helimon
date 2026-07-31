@@ -10,4 +10,5 @@ description = "A mystical necklace that enhances the wearer's spiritual connecti
 "
 icon = ExtResource("1_jfkn2")
 equip_slot = 1
+rarity = 1
 spirit_bonus = 1.0

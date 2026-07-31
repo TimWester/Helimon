@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://diup8ft8285aa"]
+
+[ext_resource type="Texture2D" uid="uid://ncf6iqg76v62" path="res://Sprites/Items/Equipment/Bracer_of_Vitality_Sprite.png" id="1_8vjnt"]
+[ext_resource type="Script" uid="uid://b5v3qx8yt2ml7" path="res://Scripts/Items/item.gd" id="2_hcyia"]
+
+[resource]
+script = ExtResource("2_hcyia")
+item_name = "Bracer of Vitality"
+description = "A sturdy ring that increases the wearer's maximum health."
+icon = ExtResource("1_8vjnt")
+item_type = 3
+equip_slot = 11
+health_bonus = 25.0

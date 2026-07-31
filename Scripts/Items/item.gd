@@ -10,13 +10,21 @@ class_name Item
 @export var icon: Texture2D = preload("res://Sprites/UI/ItemPlaceholder.png")
 
 @export_group("Item Type")
-enum ItemType { EQUIPMENT, CONSUMABLE, QUEST }
+## PARTY_EQUIPMENT items equip onto a party member's card in the Party panel
+## (Weapon/Cape/Trinket slots) instead of the player's own Equipment panel.
+enum ItemType { EQUIPMENT, CONSUMABLE, QUEST, PARTY_EQUIPMENT }
 @export var item_type: ItemType = ItemType.EQUIPMENT
 
 ## Which gear slot this item equips into. NONE means it can't be equipped
-## in the Equipment panel (e.g. consumables/quest items).
-enum EquipSlot { NONE, NECKLACE, HELM, HAND, SHOULDER, RING, TORSO, LEGS, BOOTS }
+## in the Equipment panel (e.g. consumables/quest items). WEAPON/CAPE/TRINKET
+## are for PARTY_EQUIPMENT items and equip into a party member's card instead.
+enum EquipSlot { NONE, NECKLACE, HELM, HAND, SHOULDER, RING, TORSO, LEGS, BOOTS, WEAPON, CAPE, TRINKET }
 @export var equip_slot: EquipSlot = EquipSlot.NONE
+
+## Determines the color of this item's name in tooltips, following common
+## RPG rarity color conventions.
+enum ItemRarity { COMMON, UNCOMMON, RARE, EPIC, LEGENDARY }
+@export var rarity: ItemRarity = ItemRarity.COMMON
 
 @export_group("Equipment Stats")
 ## Spirit bonus when this item is equipped (affects mana regeneration)
@@ -48,6 +56,111 @@ func get_stats_text() -> String:
 	if stats.size() > 0:
 		return "\n".join(stats)
 	return "No stat bonuses"
+
+## Returns the hex color for this item's rarity, used to tint its name in tooltips.
+func get_rarity_color() -> String:
+	match rarity:
+		ItemRarity.COMMON:
+			return "#FFFFFF"  # White
+		ItemRarity.UNCOMMON:
+			return "#1EFF00"  # Green
+		ItemRarity.RARE:
+			return "#0070DD"  # Blue
+		ItemRarity.EPIC:
+			return "#A335EE"  # Purple
+		ItemRarity.LEGENDARY:
+			return "#FF8000"  # Orange
+		_:
+			return "#FFFFFF"
+
+## Returns the display name for this item's rarity tier.
+func get_rarity_name() -> String:
+	match rarity:
+		ItemRarity.COMMON:
+			return "Common"
+		ItemRarity.UNCOMMON:
+			return "Uncommon"
+		ItemRarity.RARE:
+			return "Rare"
+		ItemRarity.EPIC:
+			return "Epic"
+		ItemRarity.LEGENDARY:
+			return "Legendary"
+		_:
+			return "Common"
+
+## Returns the display name for this item's equipment slot type.
+func get_slot_name() -> String:
+	match equip_slot:
+		EquipSlot.NONE:
+			return ""
+		EquipSlot.NECKLACE:
+			return "Necklace"
+		EquipSlot.HELM:
+			return "Helm"
+		EquipSlot.HAND:
+			return "Hand"
+		EquipSlot.SHOULDER:
+			return "Shoulder"
+		EquipSlot.RING:
+			return "Ring"
+		EquipSlot.TORSO:
+			return "Torso"
+		EquipSlot.LEGS:
+			return "Legs"
+		EquipSlot.BOOTS:
+			return "Boots"
+		EquipSlot.WEAPON:
+			return "Weapon"
+		EquipSlot.CAPE:
+			return "Cape"
+		EquipSlot.TRINKET:
+			return "Trinket"
+		_:
+			return ""
+
+## Builds the full BBCode tooltip text for this item: name tinted by rarity,
+## rarity label (if not Common), description, colored stat bonuses, and an
+## equip/unequip hint. Intended for a RichTextLabel with bbcode_enabled = true.
+func get_tooltip_text() -> String:
+	var lines: PackedStringArray = []
+	var rarity_color = get_rarity_color()
+	
+	# First line: item name on left, slot type on right
+	var slot_name = get_slot_name()
+	if slot_name != "":
+		# Calculate spacing to push slot name to the right (approximate)
+		var name_length = item_name.length()
+		var spaces_needed = max(1, 30 - name_length)
+		var spacing = " ".repeat(spaces_needed)
+		lines.append("[color=%s]%s[/color]%s[color=#999999]%s[/color]" % [rarity_color, item_name, spacing, slot_name])
+	else:
+		lines.append("[color=%s]%s[/color]" % [rarity_color, item_name])
+	
+	if rarity != ItemRarity.COMMON:
+		lines.append("[color=%s]%s[/color]" % [rarity_color, get_rarity_name()])
+	lines.append("")
+	
+	if description and description.strip_edges() != "":
+		lines.append("[color=#CCCCCC]%s[/color]" % description.strip_edges())
+		lines.append("")
+	
+	var stats_text = get_stats_text()
+	if stats_text == "No stat bonuses":
+		lines.append("[color=#888888]%s[/color]" % stats_text)
+	else:
+		lines.append("[color=#32CD32]%s[/color]" % stats_text)  # Bright green for bonuses
+	
+	if equip_slot != EquipSlot.NONE:
+		lines.append("")
+		if item_type == ItemType.PARTY_EQUIPMENT:
+			lines.append("[color=#77AAFF]Party Member Equipment[/color]")
+		if GameState.is_item_equipped(self) or GameState.is_party_item_equipped(self):
+			lines.append("[color=#AAAAAA]Right-click to unequip[/color]")
+		else:
+			lines.append("[color=#AAAAAA]Right-click to equip[/color]")
+	
+	return "\n".join(lines)
 
 ## Apply this item's stats to the player (when equipped)
 func apply_stats() -> void:

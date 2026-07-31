@@ -6,6 +6,7 @@ var prev_w = false
 var prev_s = false
 var prev_a = false
 var prev_d = false
+var last_direction = "down"  # Track last facing direction for idle animations
 
 # Player Stats (editable in Inspector)
 @export_group("Player Stats")
@@ -51,6 +52,12 @@ func _ready() -> void:
 	GameState.set_leveling_data(max_level, health_gain_per_level, mana_gain_per_level, damage_gain_per_level, spirit_gain_per_level, haste_gain_per_level, exp_required_per_level)
 
 func _physics_process(_delta: float) -> void:
+	# Freeze movement while an NPC dialogue window is open
+	if GameState.dialogue_active:
+		velocity = Vector2.ZERO
+		move_and_slide()
+		return
+	
 	var input_velocity = Vector2.ZERO
 	
 	# Check current key states
@@ -99,24 +106,39 @@ func _physics_process(_delta: float) -> void:
 	# Move ONLY in the active direction (ignore other held keys)
 	if active_key == KEY_W:
 		input_velocity.y -= 1
-		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_up"):
-			animated_sprite.play("walk_up")
+		last_direction = "up"
+		if animated_sprite:
+			animated_sprite.flip_h = false
+			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_up"):
+				animated_sprite.play("walk_up")
 	elif active_key == KEY_S:
 		input_velocity.y += 1
-		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_down"):
-			animated_sprite.play("walk_down")
+		last_direction = "down"
+		if animated_sprite:
+			animated_sprite.flip_h = false
+			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_down"):
+				animated_sprite.play("walk_down")
 	elif active_key == KEY_A:
 		input_velocity.x -= 1
-		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_left"):
-			animated_sprite.play("walk_left")
+		last_direction = "left"
+		if animated_sprite:
+			animated_sprite.flip_h = true
+			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_left"):
+				animated_sprite.play("walk_left")
 	elif active_key == KEY_D:
 		input_velocity.x += 1
-		if animated_sprite and animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_right"):
-			animated_sprite.play("walk_right")
+		last_direction = "right"
+		if animated_sprite:
+			animated_sprite.flip_h = false
+			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("walk_left"):
+				animated_sprite.play("walk_left")
 	else:
-		# Stop animation when not moving
-		if animated_sprite and animated_sprite.is_playing():
-			animated_sprite.stop()
+		# Play idle animation when not moving
+		if animated_sprite:
+			var idle_anim = "idle_" + last_direction
+			if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation(idle_anim):
+				if animated_sprite.animation != idle_anim:
+					animated_sprite.play(idle_anim)
 	
 	# Apply deadzone to filter controller drift
 	if abs(input_velocity.x) < 0.2:

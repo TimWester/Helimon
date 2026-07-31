@@ -1,0 +1,233 @@
+[gd_scene format=3 uid="uid://c3r8t0kq4m8xh"]
+
+[ext_resource type="Script" uid="uid://bdv51b1u2nu2h" path="res://Scripts/Party/party_member_card.gd" id="1_card_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
+bg_color = Color(0.06, 0.06, 0.09, 0.82)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.72, 0.6, 0.35, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_portrait_frame"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.85, 0.2, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(0.08, 0.08, 0.08, 0.95)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
+bg_color = Color(0.15, 0.72, 0.18, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_equip_slot"]
+bg_color = Color(0.68, 0.5, 0.32, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.35, 0.2, 0.1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="PartyMemberCard" type="Control" unique_id=491959775]
+custom_minimum_size = Vector2(240, 230)
+layout_mode = 3
+anchors_preset = 0
+offset_top = 29.0
+offset_right = 240.0
+offset_bottom = 259.0
+script = ExtResource("1_card_script")
+
+[node name="Header" type="Panel" parent="." unique_id=497643443]
+layout_mode = 0
+offset_right = 240.0
+offset_bottom = 90.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_header")
+
+[node name="PortraitFrame" type="Panel" parent="Header" unique_id=393532387]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 72.0
+offset_bottom = 72.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_portrait_frame")
+
+[node name="PortraitTexture" type="TextureRect" parent="Header/PortraitFrame" unique_id=374515203]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 60.0
+offset_bottom = 60.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Header" unique_id=682490603]
+layout_mode = 0
+offset_left = 82.0
+offset_top = 6.0
+offset_right = 202.0
+offset_bottom = 28.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 18
+text = "Member"
+
+[node name="LevelLabel" type="Label" parent="Header" unique_id=672328576]
+layout_mode = 0
+offset_left = 180.0
+offset_top = 8.0
+offset_right = 232.0
+offset_bottom = 28.0
+theme_override_colors/font_color = Color(0.85, 0.72, 0.4, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 13
+text = "Lv. 1"
+horizontal_alignment = 2
+
+[node name="HealthBar" type="ProgressBar" parent="Header" unique_id=1198071238]
+layout_mode = 0
+offset_left = 82.0
+offset_top = 32.0
+offset_right = 232.0
+offset_bottom = 50.0
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
+value = 100.0
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="Header/HealthBar" unique_id=35947669]
+layout_mode = 0
+offset_right = 150.0
+offset_bottom = 18.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 11
+text = "100 / 100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EquipmentTitle" type="Label" parent="." unique_id=1495435625]
+layout_mode = 0
+offset_top = 98.0
+offset_right = 240.0
+offset_bottom = 116.0
+theme_override_colors/font_color = Color(0.85, 0.75, 0.55, 1)
+theme_override_font_sizes/font_size = 13
+text = "Equipment"
+
+[node name="EquipmentRow" type="Control" parent="." unique_id=1819101950]
+anchors_preset = 0
+offset_top = 118.0
+offset_right = 240.0
+offset_bottom = 170.0
+
+[node name="WeaponSlot" type="Panel" parent="EquipmentRow" unique_id=34389730]
+layout_mode = 0
+offset_right = 52.0
+offset_bottom = 52.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_equip_slot")
+
+[node name="Label" type="Label" parent="EquipmentRow/WeaponSlot" unique_id=1541825255]
+layout_mode = 0
+offset_right = 52.0
+offset_bottom = 52.0
+theme_override_colors/font_color = Color(0.25, 0.13, 0.05, 1)
+theme_override_font_sizes/font_size = 10
+text = "Weapon"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="CapeSlot" type="Panel" parent="EquipmentRow" unique_id=1873248280]
+layout_mode = 0
+offset_left = 58.0
+offset_right = 110.0
+offset_bottom = 52.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_equip_slot")
+
+[node name="Label" type="Label" parent="EquipmentRow/CapeSlot" unique_id=1761081577]
+layout_mode = 0
+offset_right = 52.0
+offset_bottom = 52.0
+theme_override_colors/font_color = Color(0.25, 0.13, 0.05, 1)
+theme_override_font_sizes/font_size = 10
+text = "Cape"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Trinket1Slot" type="Panel" parent="EquipmentRow" unique_id=1234454526]
+layout_mode = 0
+offset_left = 116.0
+offset_right = 168.0
+offset_bottom = 52.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_equip_slot")
+
+[node name="Label" type="Label" parent="EquipmentRow/Trinket1Slot" unique_id=699432432]
+layout_mode = 0
+offset_right = 52.0
+offset_bottom = 52.0
+theme_override_colors/font_color = Color(0.25, 0.13, 0.05, 1)
+theme_override_font_sizes/font_size = 10
+text = "Trinket"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Trinket2Slot" type="Panel" parent="EquipmentRow" unique_id=440168224]
+layout_mode = 0
+offset_left = 174.0
+offset_right = 226.0
+offset_bottom = 52.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_equip_slot")
+
+[node name="Label" type="Label" parent="EquipmentRow/Trinket2Slot" unique_id=71151542]
+layout_mode = 0
+offset_right = 52.0
+offset_bottom = 52.0
+theme_override_colors/font_color = Color(0.25, 0.13, 0.05, 1)
+theme_override_font_sizes/font_size = 10
+text = "Trinket"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="StatsTitle" type="Label" parent="." unique_id=1268381514]
+layout_mode = 0
+offset_top = 178.0
+offset_right = 240.0
+offset_bottom = 196.0
+theme_override_colors/font_color = Color(0.85, 0.75, 0.55, 1)
+theme_override_font_sizes/font_size = 13
+text = "Stats"
+
+[node name="DamageLabel" type="Label" parent="." unique_id=167360267]
+layout_mode = 0
+offset_top = 198.0
+offset_right = 240.0
+offset_bottom = 220.0
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 10
+text = "Attack Damage: 8"

@@ -16,11 +16,14 @@ This folder contains all the items in the game. Items can be assigned as rewards
    - **Item Name**: Display name shown in the UI
    - **Description**: Lore/description text
    - **Icon**: (Optional) A texture for the item icon
-   - **Item Type**: EQUIPMENT, CONSUMABLE, or QUEST
-   - **Spirit Bonus**: Increases mana regeneration per second
-   - **Health Bonus**: Increases max health
-   - **Mana Bonus**: Increases max mana
-   - **Damage Bonus**: Increases damage dealt
+   - **Item Type**: EQUIPMENT, CONSUMABLE, QUEST, or PARTY_EQUIPMENT
+     - EQUIPMENT items equip into the player's own Equipment panel (Necklace/Helm/Hand/Shoulder/Ring/Torso/Legs/Boots)
+     - PARTY_EQUIPMENT items instead equip onto a party member's card in the Party panel (Weapon/Cape/Trinket slots)
+   - **Equip Slot**: which slot this item goes into. Use NECKLACE/HELM/HAND/SHOULDER/RING/TORSO/LEGS/BOOTS for EQUIPMENT items, or WEAPON/CAPE/TRINKET for PARTY_EQUIPMENT items
+   - **Spirit Bonus**: Increases mana regeneration per second (player only)
+   - **Health Bonus**: Increases max health (player if EQUIPMENT, or the equipped party member if PARTY_EQUIPMENT)
+   - **Mana Bonus**: Increases max mana (player only)
+   - **Damage Bonus**: Increases damage dealt (player if EQUIPMENT, or the equipped party member if PARTY_EQUIPMENT)
 
 ### Method 2: Create from Scratch in Godot
 
@@ -42,6 +45,7 @@ The `_TEMPLATE_item.tres` file is a blank template with all properties set to de
 - **mana_amulet.tres** - Amulet of the Arcane (+20 Mana)
 - **warrior_sword.tres** - Warrior's Blade (+5 Damage)
 - **sage_pendant.tres** - Sage's Pendant (Multi-stat bonus)
+- **party_dagger.tres** - Rusty Dagger (+3 Damage, PARTY_EQUIPMENT/Weapon slot - equips onto a party member instead of the player)
 - **_TEMPLATE_item.tres** - Blank template for creating new items
 
 ## Assigning Items to Enemies

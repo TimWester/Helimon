@@ -26,10 +26,12 @@ y_sort_enabled = true
 script = ExtResource("1_chest_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1904481655]
+offset = Vector2(0, -64)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("2_chest_texture")
 
 [node name="InteractionArea" type="Area2D" parent="." unique_id=149435620]
+position = Vector2(0, -32)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=1495351320]
 shape = SubResource("CircleShape2D_interaction")
@@ -48,6 +50,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=431321566]
+position = Vector2(0, -32)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1610381508]
 position = Vector2(-0.5, 3)
